@@ -40,4 +40,8 @@ public class Alphabet {
 	public static int indexOf(char character) {
 		return ALPHABET.get(character);
 	}
+	
+	public static char nextCharacter(char character) {
+		return ALPHABET_ARRAY[ (indexOf(character)+1) % 26 ];
+	}
 }

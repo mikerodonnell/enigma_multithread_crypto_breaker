@@ -1,6 +1,6 @@
 package com.demo.crypto.enigma.model;
 
-import java.util.Arrays;
+import java.util.Map;
 
 import com.demo.crypto.enigma.model.util.Alphabet;
 
@@ -8,36 +8,50 @@ public class EnigmaMachine {
 
 	private static final char[] DEFAULT_INITIAL_POSITIONS = {'A','A','A'};
 	private final char[] initialPositions;
+	private Map<Character, Character> initialSteckeredPairs;
 	
 	private AbstractEnigmaRotor slowRotor;
 	private AbstractEnigmaRotor middleRotor;
 	private AbstractEnigmaRotor fastRotor;
 	private AbstractEnigmaReflector reflector;
+	private Steckerbrett steckerbrett;
 	
 	public EnigmaMachine() {
 		this(DEFAULT_INITIAL_POSITIONS);
 	}
 	
-	public EnigmaMachine( char[] initialPositions ) { // TODO: validation, configurationexception
+	public EnigmaMachine( char[] initialPositions ) {
+		this( initialPositions, null );
+	}
+	
+	public EnigmaMachine( char[] initialPositions, Map<Character, Character> steckeredPairs ) { // TODO: validation, configurationexception
 		this.initialPositions = initialPositions;
+		this.initialSteckeredPairs = steckeredPairs;
 		
 		slowRotor = new EnigmaIRotor1( initialPositions[0], null );
 		middleRotor = new EnigmaIRotor2( initialPositions[1], slowRotor );
 		fastRotor = new EnigmaIRotor3( initialPositions[2], middleRotor );
 		
 		reflector = new WideBReflector();
+		
+		steckerbrett = new Steckerbrett(steckeredPairs);
 	}
 	
 	public void set( char[] initialPositions ) {
+		set(initialPositions, null); // no steckering used
+	}
+	
+	public void set( char[] initialPositions, Map<Character, Character> steckeredPairs ) {
 		fastRotor.setOffset( Alphabet.indexOf(initialPositions[2]) );
 		middleRotor.setOffset( Alphabet.indexOf(initialPositions[1]) );
 		slowRotor.setOffset( Alphabet.indexOf(initialPositions[0]) );
+		
+		steckerbrett.clear();
+		steckerbrett.stecker(steckeredPairs);
 	}
 	
 	public void reset() {
-		fastRotor.setOffset( Alphabet.indexOf(initialPositions[2]) );
-		middleRotor.setOffset( Alphabet.indexOf(initialPositions[1]) );
-		slowRotor.setOffset( Alphabet.indexOf(initialPositions[0]) );
+		set( initialPositions, initialSteckeredPairs );
 	}
 	
 	public String decrypt( final String cipherText ) { // just an alias #encrypt()
@@ -55,13 +69,14 @@ public class EnigmaMachine {
 	public char encrypt( char input ) {
 		fastRotor.step();
 		
-		int originAbsoluteIndex = Alphabet.indexOf(input);
+		int originAbsoluteIndex = Alphabet.indexOf( steckerbrett.getSteckeredCharacter(input) );
 		int indexEnteringReflector = slowRotor.getOutputIndex(middleRotor.getOutputIndex(fastRotor.getOutputIndex(originAbsoluteIndex)));
 		
 		int indexLeavingReflector = reflector.getOutputIndex(indexEnteringReflector);
 		
 		int indexToLightBoard = fastRotor.getOutputIndexInverse(middleRotor.getOutputIndexInverse(slowRotor.getOutputIndexInverse(indexLeavingReflector)));
-		return Alphabet.ALPHABET_ARRAY[indexToLightBoard];
+		
+		return steckerbrett.getSteckeredCharacter( Alphabet.ALPHABET_ARRAY[indexToLightBoard] );
 	}
 	
 	public char decrypt( char cipherCharacter ) { // just an alias for #encrypt()

@@ -1,4 +1,4 @@
-package com.demo.crypto.model;
+package com.demo.crypto.enigma.model;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +14,7 @@ public class EnigmaIRotor1Test {
 
 	public AbstractEnigmaRotor rotor;
 	
-	/*
+	
 	@Before
 	public void setupTestCase() {
 		AbstractEnigmaRotor leftRotor = new EnigmaIRotor3(null);
@@ -41,5 +41,5 @@ public class EnigmaIRotor1Test {
 		rotor.step();
 		assertEquals( 0, rotor.getOffset() );
 	}
-	*/
+	
 }

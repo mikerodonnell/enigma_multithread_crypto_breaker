@@ -1,10 +1,9 @@
-package com.demo.crypto.model;
+package com.demo.crypto.enigma.model;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import com.demo.crypto.enigma.model.*;
 
 public class AbstractEnigmaRotorTest {
 
