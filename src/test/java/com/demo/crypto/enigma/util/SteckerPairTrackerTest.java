@@ -2,30 +2,51 @@ package com.demo.crypto.enigma.util;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.demo.crypto.enigma.model.util.Alphabet;
-import com.demo.crypto.enigma.model.util.SteckerPairTracker;
+import com.demo.crypto.enigma.model.SteckerCable;
+import com.demo.crypto.enigma.model.util.SteckerCombinationTracker;
 
 public class SteckerPairTrackerTest {
-
+	
+	private SteckerCombinationTracker steckerCombinationTracker;
+	
+	@Before
+	public void setup() {
+		steckerCombinationTracker = new SteckerCombinationTracker();
+	}
+	
+	
+	@Test
+	public void testHasNext() {
+		for( int count=0; count<100; count++) {
+			steckerCombinationTracker.next();
+			assertTrue( steckerCombinationTracker.hasNext() );
+		}
+		
+		assertTrue( steckerCombinationTracker.hasNext() );
+	}
+	
 	@Test
 	public void testNext() {
-		SteckerPairTracker steckerPairTracker = new SteckerPairTracker();
+		assertEquals( 0, steckerCombinationTracker.next().size() );
 		
-		Map<Character, Character> firstPositions = new HashMap<Character, Character>();
+		List<SteckerCable> testSteckerPairs = steckerCombinationTracker.next();
+		assertEquals( 2, testSteckerPairs.size() );
+		assertEquals( 'A', testSteckerPairs.get(0).getInput() );
+		assertEquals( 'B', testSteckerPairs.get(0).getOutput() );
+		assertEquals( 'C', testSteckerPairs.get(1).getInput() );
+		assertEquals( 'D', testSteckerPairs.get(1).getOutput() );
 		
-		assertEquals( firstPositions, steckerPairTracker.next() );
-		for( int originalIndex=0; originalIndex<26; originalIndex++ ) {
-			for( int replacementIndex=originalIndex+1; replacementIndex<26; replacementIndex++ ) {
-				firstPositions.clear();
-				firstPositions.put(Alphabet.ALPHABET_ARRAY[originalIndex], Alphabet.ALPHABET_ARRAY[replacementIndex] );
-				assertEquals( firstPositions, steckerPairTracker.next() );
-			}
-			
-		}
+		testSteckerPairs = steckerCombinationTracker.next();
+		assertEquals( 2, testSteckerPairs.size() );
+		assertEquals( 'A', testSteckerPairs.get(0).getInput() );
+		assertEquals( 'B', testSteckerPairs.get(0).getOutput() );
+		assertEquals( 'C', testSteckerPairs.get(1).getInput() );
+		assertEquals( 'E', testSteckerPairs.get(1).getOutput() );
 	}
+	
 }

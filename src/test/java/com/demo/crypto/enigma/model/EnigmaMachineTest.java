@@ -1,13 +1,11 @@
 package com.demo.crypto.enigma.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
-
-import com.demo.crypto.enigma.model.EnigmaMachine;
 
 public class EnigmaMachineTest {
 	
@@ -52,13 +50,14 @@ public class EnigmaMachineTest {
 	@Test
 	public void testEncrypt() {
 		
-		Map<Character, Character> steckeredPairs = new HashMap<Character, Character>();
-		steckeredPairs.put('C', 'N');
+		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
+		steckeredPairs.add( new SteckerCable('D', 'E') );
+		steckeredPairs.add( new SteckerCable('C', 'N') );
 		EnigmaMachine enigmaMachine = new EnigmaMachine( new char[]{'M', 'O', 'D'}, steckeredPairs );
 		
 		// these are sample encryptions for other implementations, trusting that they're correct
-		assertEquals( "JNIMIGLICIHRPAPSMWBXTWZNZJ", enigmaMachine.encrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZ") );
+		assertEquals( "JNIQOGLICIHRPAPSMWBXTWZNZJ", enigmaMachine.encrypt("ABCDEFGHIJKLMNOPQRSTUVWXYZ") );
 		enigmaMachine.reset(); 
-		assertEquals( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", enigmaMachine.decrypt("JNIMIGLICIHRPAPSMWBXTWZNZJ") );
+		assertEquals( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", enigmaMachine.decrypt("JNIQOGLICIHRPAPSMWBXTWZNZJ") );
 	}
 }

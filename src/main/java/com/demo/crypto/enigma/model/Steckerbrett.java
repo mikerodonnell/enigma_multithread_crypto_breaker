@@ -1,6 +1,7 @@
 package com.demo.crypto.enigma.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.demo.crypto.enigma.model.exception.InvalidConfigurationException;
@@ -11,19 +12,18 @@ public class Steckerbrett {
 
 	Steckerbrett() { }
 	
-	Steckerbrett( Map<Character, Character> steckeredPairs ) {
-		if(steckeredPairs != null)
-			stecker(steckeredPairs);
+	Steckerbrett( List<SteckerCable> steckeredPairs ) {
+		stecker(steckeredPairs);
 	}
 	
-	public void stecker( final Map<Character, Character> steckeredPairs ) {
+	public void stecker( final List<SteckerCable> steckeredPairs ) {
 		if( steckeredPairs != null && !steckeredPairs.isEmpty() ) {
-			if( !(steckeredPairs.size() == 1) ) // TODO: this should be 10
+			if( !(steckeredPairs.size() == 2) ) // TODO: this should be 10
 				throw new InvalidConfigurationException("only 0 or exactly 10 steckered pairs are supported.");
 			
 			// we can't just copy steckeredPairs into this.steckeredPairs; have to validate each one.
-			for( Character original : steckeredPairs.keySet() )
-				stecker( original, steckeredPairs.get(original) );
+			for( SteckerCable steckerCable : steckeredPairs )
+				stecker( steckerCable.getInput(), steckerCable.getOutput() );
 		}
 	}
 	

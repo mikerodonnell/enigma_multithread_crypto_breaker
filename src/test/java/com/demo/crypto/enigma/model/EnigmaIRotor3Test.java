@@ -14,7 +14,7 @@ public class EnigmaIRotor3Test {
 
 	public AbstractEnigmaRotor rotor;
 	
-	/*
+	
 	@Before
 	public void setupTestCase() {
 		AbstractEnigmaRotor leftRotor = new EnigmaIRotor2(null);
@@ -40,5 +40,5 @@ public class EnigmaIRotor3Test {
 		rotor.step();
 		assertEquals( 0, rotor.getOffset() );
 	}
-	*/
+	
 }

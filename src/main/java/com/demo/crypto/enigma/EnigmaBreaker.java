@@ -1,32 +1,42 @@
 package com.demo.crypto.enigma;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 import com.demo.crypto.enigma.model.EnigmaMachine;
+import com.demo.crypto.enigma.model.SteckerCable;
+import com.demo.crypto.enigma.model.exception.InvalidConfigurationException;
 import com.demo.crypto.enigma.model.util.Alphabet;
-import com.demo.crypto.enigma.model.util.SteckerPairTracker;
+import com.demo.crypto.enigma.model.util.SteckerCombinationTracker;
 
 public class EnigmaBreaker {
 	
 	public static String decrypt( final String cipherText ) {
 		System.out.println( "~~~~~~~ decrypting cipher text: " + cipherText );
 		
-		final String startingCrib = "HELLO";
+		final String startingCrib = "HELLOWORLD";
 		final char[] startingCribArray = startingCrib.toCharArray();
 		
 		final EnigmaMachine enigmaMachine = new EnigmaMachine();
 		
 		char[] initialPositions = new char[3];
 		
-		String substring = cipherText.substring(0, startingCrib.length()); // the first 5 characters of the cipher text, see if it corresponds to the crib
+		String substring = cipherText.substring(0, startingCrib.length()); // the first 10 characters of the cipher text, see if it corresponds to the crib
 		final char[] substringArray = substring.toCharArray();
 		
-		SteckerPairTracker steckerPairTracker = new SteckerPairTracker();
+		SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker();
 		
-		while( steckerPairTracker.hasNext() ) {
-			Map<Character, Character> steckeredPairs = steckerPairTracker.next();
-			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
+		while( steckerCombinationTracker.hasNext() ) {
+			List<SteckerCable> steckeredPairs = steckerCombinationTracker.next();
+			try {
+				enigmaMachine.setSteckers(steckeredPairs);
+			}
+			catch( InvalidConfigurationException invalidConfigurationException ) {
+				// skip this stecker combination, it's.invalid. example: [C => E, E => Z]
+				continue;
+			}
 			
+			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
 			for( int slowRotorIndex=0; slowRotorIndex<26; slowRotorIndex++ ) {
 				initialPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
 				
@@ -36,17 +46,19 @@ public class EnigmaBreaker {
 					for( int fastRotorIndex=0; fastRotorIndex<26; fastRotorIndex++ ) {
 						initialPositions[2] = Alphabet.ALPHABET_ARRAY[fastRotorIndex];
 						
-						enigmaMachine.set(initialPositions, steckeredPairs);
+						enigmaMachine.setRotors(initialPositions);
 						
 						if( isMatchWithSettings(startingCribArray, substringArray, enigmaMachine) ) {
 							// we found a match!!
-							// now that we know the correct settings, we need to set the machine back to those settings since each test pass alters the state. then,
-							// we can decrypt!
-							enigmaMachine.set(initialPositions, steckeredPairs);
+							// now that we know the correct settings, we need to set the rotors back to the last settings we tested, since each test pass turns the rotors.
+							// the steckers are fine; they don't move around each time we encipher a letter like the rotors do.
+							// then, we can decrypt!
+							
+							System.out.println("~~~~~~~~~~~ MATCH! " + Arrays.toString(initialPositions));
+							enigmaMachine.setRotors(initialPositions);
 							
 							return enigmaMachine.decrypt(cipherText);
 						}
-						
 					}
 				}
 			}
