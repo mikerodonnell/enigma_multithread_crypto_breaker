@@ -12,27 +12,61 @@ import com.demo.crypto.enigma.model.SteckerCable;
 
 public class EnigmaBreakerTest {
 	
+	// this could be any valid positions, but for the sake of a thorough test that exercises the most code, choosing { Z, Z, Z }
+	private static final char[] TEST_INITIAL_POSITIONS = new char[]{ 'Z', 'Z', 'Z' };
+	
 	@Test
 	public void testDecryptUnsteckered() {
-		char[] randomInitialPositions = new char[]{ 'Z', 'Z', 'Z' };
-		EnigmaMachine enigmaMachine = new EnigmaMachine( randomInitialPositions );
+		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS );
 		
 		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM") ) );
 	}
-	
 	
 	@Test
-	public void testDecrypt() {
-		char[] randomInitialPositions = new char[]{ 'Z', 'Z', 'Z' };
-		
+	public void testDecryptOneSteckerPair() {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
-		steckeredPairs.add( new SteckerCable('C', 'E') );
-		steckeredPairs.add( new SteckerCable('L', 'Z') ); // TODO: our crib drag doesnt work where the crib includes 0 stecker chars (out of 20 total)
-		// TODO: more pairs
+		// TODO: our crib drag doesn't work where steckered chars are in the text but not in the crib portion
+		steckeredPairs.add( new SteckerCable('B', 'E') );
 		
-		EnigmaMachine enigmaMachine = new EnigmaMachine( randomInitialPositions, steckeredPairs );
+		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM") ) );
+		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
 	}
 	
+	@Test
+	public void testDecryptTwoSteckerPair() {
+		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
+		steckeredPairs.add( new SteckerCable('B', 'E') );
+		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		
+		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
+		
+		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+	}
+	
+	@Test
+	public void testDecryptThreeSteckerPair() {
+		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
+		steckeredPairs.add( new SteckerCable('A', 'E') );
+		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		steckeredPairs.add( new SteckerCable('H', 'R') );
+		
+		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
+		
+		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+	}
+	/*
+	@Test
+	public void testDecryptFourSteckerPair() {
+		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
+		steckeredPairs.add( new SteckerCable('B', 'E') );
+		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		steckeredPairs.add( new SteckerCable('H', 'R') );
+		steckeredPairs.add( new SteckerCable('O', 'X') );
+		
+		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
+		
+		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+	}
+	*/
 }
