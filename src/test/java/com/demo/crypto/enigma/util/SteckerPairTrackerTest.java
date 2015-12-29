@@ -1,6 +1,7 @@
 package com.demo.crypto.enigma.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.demo.crypto.enigma.model.SteckerCable;
-import com.demo.crypto.enigma.model.util.SteckerCombinationTracker;
 
 public class SteckerPairTrackerTest {
 	

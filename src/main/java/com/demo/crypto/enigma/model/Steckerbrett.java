@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.demo.crypto.enigma.model.exception.DuplicateSteckerException;
-import com.demo.crypto.enigma.model.exception.InvalidConfigurationException;
+import com.demo.crypto.enigma.exception.DuplicateSteckerException;
+import com.demo.crypto.enigma.exception.InvalidConfigurationException;
 
 public class Steckerbrett {
 	

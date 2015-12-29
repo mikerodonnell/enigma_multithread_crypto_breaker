@@ -43,7 +43,7 @@ public class EnigmaBreakerTest {
 		
 		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
 	}
-	
+	/*
 	@Test
 	public void testDecryptThreeSteckerPair() {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
@@ -55,7 +55,7 @@ public class EnigmaBreakerTest {
 		
 		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
 	}
-	/*
+	
 	@Test
 	public void testDecryptFourSteckerPair() {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();

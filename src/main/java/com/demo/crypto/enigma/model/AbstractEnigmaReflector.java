@@ -2,7 +2,7 @@ package com.demo.crypto.enigma.model;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.demo.crypto.enigma.model.util.Alphabet;
+import com.demo.crypto.enigma.util.Alphabet;
 
 public abstract class AbstractEnigmaReflector {
 

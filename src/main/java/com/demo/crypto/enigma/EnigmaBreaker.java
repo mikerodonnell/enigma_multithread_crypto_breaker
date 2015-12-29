@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.demo.crypto.enigma.model.EnigmaMachine;
 import com.demo.crypto.enigma.model.SteckerCable;
-import com.demo.crypto.enigma.model.exception.DuplicateSteckerException;
-import com.demo.crypto.enigma.model.util.Alphabet;
-import com.demo.crypto.enigma.model.util.SteckerCombinationTracker;
+import com.demo.crypto.enigma.exception.DuplicateSteckerException;
+import com.demo.crypto.enigma.util.Alphabet;
+import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
 public class EnigmaBreaker {
 	
@@ -50,7 +50,7 @@ public class EnigmaBreaker {
 			
 			if( steckeredPairs.isEmpty() )
 				System.out.println("~~~~~~~~~~~ attempting to break with no steckers");
-			else if( steckerCombinationTracker.getCombinationsCount() % 1000 == 0 )
+			else if( steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
 				System.out.println("~~~~~~~~~~~ still working ... currently attempting to break with steckers: " + steckeredPairs);
 			
 			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.

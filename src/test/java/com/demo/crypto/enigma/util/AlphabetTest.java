@@ -1,10 +1,8 @@
 package com.demo.crypto.enigma.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import com.demo.crypto.enigma.model.util.Alphabet;
 
 public class AlphabetTest {
 

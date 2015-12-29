@@ -1,14 +1,11 @@
 package com.demo.crypto.enigma.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.demo.crypto.enigma.model.AbstractEnigmaRotor;
-import com.demo.crypto.enigma.model.EnigmaIRotor1;
-import com.demo.crypto.enigma.model.EnigmaIRotor2;
-import com.demo.crypto.enigma.model.util.Alphabet;
+import com.demo.crypto.enigma.util.Alphabet;
 
 public class EnigmaIRotor2Test {
 

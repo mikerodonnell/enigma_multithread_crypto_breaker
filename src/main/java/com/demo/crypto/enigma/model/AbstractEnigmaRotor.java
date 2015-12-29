@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.demo.crypto.enigma.model.util.Alphabet;
+import com.demo.crypto.enigma.util.Alphabet;
 
 public abstract class AbstractEnigmaRotor implements Steppable {
 	
