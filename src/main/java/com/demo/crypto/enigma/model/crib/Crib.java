@@ -17,7 +17,7 @@ public abstract class Crib {
 	}
 	
 	
-	public int getStartPosition() {
+	public Integer getStartIndex() {
 		return startIndex;
 	}
 	
@@ -27,5 +27,10 @@ public abstract class Crib {
 	
 	public String getTranslation() {
 		return translation;
+	}
+	
+	@Override
+	public String toString() {
+		return plainText;
 	}
 }

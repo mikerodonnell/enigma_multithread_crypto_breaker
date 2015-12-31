@@ -8,7 +8,7 @@ import com.demo.crypto.enigma.model.EnigmaMachine;
 import com.demo.crypto.enigma.model.SteckerCable;
 import com.demo.crypto.enigma.model.crib.Crib;
 import com.demo.crypto.enigma.util.Alphabet;
-import com.demo.crypto.enigma.util.CribGuesser;
+import com.demo.crypto.enigma.util.CribDragger;
 import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
 public class EnigmaBreaker {
@@ -28,54 +28,57 @@ public class EnigmaBreaker {
 	public static String decrypt( final String cipherText, int steckerPairCount ) {
 		System.out.println( "~~~~~~~ decrypting cipher text: " + cipherText );
 		
-		final Crib crib = CribGuesser.getCribForMessage( cipherText );
+		final Crib crib = CribDragger.getCribForMessage( cipherText );
 		
-		final EnigmaMachine enigmaMachine = new EnigmaMachine();
-		
-		char[] initialPositions = new char[3];
-		
-		String substring = cipherText.substring(0, crib.getPlainText().length); // the first X characters of the cipher text.
-		final char[] substringArray = substring.toCharArray();
-		
-		SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker(steckerPairCount);
-		
-		while( steckerCombinationTracker.hasNext() ) {
-			List<SteckerCable> steckeredPairs = steckerCombinationTracker.next();
-			try {
-				enigmaMachine.setSteckers(steckeredPairs);
-			}
-			catch( DuplicateSteckerException duplicateSteckerException ) {
-				// skip this stecker combination, it's.invalid. example: [C => E, E => Z]
-				continue;
-			}
+		if( crib != null ) {
+			System.out.println( "~~~~~~~ using crib: " + crib );
+			final EnigmaMachine enigmaMachine = new EnigmaMachine();
 			
-			if( steckeredPairs.isEmpty() )
-				System.out.println("~~~~~~~~~~~ attempting to break with no steckers");
-			else if( steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
-				System.out.println("~~~~~~~~~~~ still working ... currently attempting to break with steckers: " + steckeredPairs);
+			char[] initialPositions = new char[3];
 			
-			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
-			for( int slowRotorIndex=0; slowRotorIndex<26; slowRotorIndex++ ) {
-				initialPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
+			String substring = cipherText.substring(0, crib.getPlainText().length); // the first X characters of the cipher text.
+			final char[] substringArray = substring.toCharArray();
+			
+			SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker(steckerPairCount);
+			
+			while( steckerCombinationTracker.hasNext() ) {
+				List<SteckerCable> steckeredPairs = steckerCombinationTracker.next();
+				try {
+					enigmaMachine.setSteckers(steckeredPairs);
+				}
+				catch( DuplicateSteckerException duplicateSteckerException ) {
+					// skip this stecker combination, it's.invalid. example: [C => E, E => Z]
+					continue;
+				}
 				
-				for( int middleRotorIndex=0; middleRotorIndex<26; middleRotorIndex++ ) {
-					initialPositions[1] = Alphabet.ALPHABET_ARRAY[middleRotorIndex];
+				if( steckeredPairs.isEmpty() )
+					System.out.println("~~~~~~~~~~~ attempting to break with no steckers");
+				else if( steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
+					System.out.println("~~~~~~~~~~~ still working ... currently attempting to break with steckers: " + steckeredPairs);
+				
+				// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
+				for( int slowRotorIndex=0; slowRotorIndex<26; slowRotorIndex++ ) {
+					initialPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
 					
-					for( int fastRotorIndex=0; fastRotorIndex<26; fastRotorIndex++ ) {
-						initialPositions[2] = Alphabet.ALPHABET_ARRAY[fastRotorIndex];
+					for( int middleRotorIndex=0; middleRotorIndex<26; middleRotorIndex++ ) {
+						initialPositions[1] = Alphabet.ALPHABET_ARRAY[middleRotorIndex];
 						
-						enigmaMachine.setRotors(initialPositions);
-						
-						if( isMatchWithSettings(crib.getPlainText(), substringArray, enigmaMachine) ) {
-							// we found a match!!
-							// now that we know the correct settings, we need to set the rotors back to the last settings we tested, since each test pass turns the rotors.
-							// the steckers are fine; they don't move around each time we encipher a letter like the rotors do.
-							// then, we can decrypt!
+						for( int fastRotorIndex=0; fastRotorIndex<26; fastRotorIndex++ ) {
+							initialPositions[2] = Alphabet.ALPHABET_ARRAY[fastRotorIndex];
 							
-							System.out.println("~~~~~~~~~~~ MATCH! steckers: " + steckeredPairs + ", rotor positions: " + Arrays.toString(initialPositions));
 							enigmaMachine.setRotors(initialPositions);
 							
-							return enigmaMachine.decrypt(cipherText);
+							if( isMatchWithSettings(crib.getPlainText(), substringArray, enigmaMachine) ) {
+								// we found a match!!
+								// now that we know the correct settings, we need to set the rotors back to the last settings we tested, since each test pass turns the rotors.
+								// the steckers are fine; they don't move around each time we encipher a letter like the rotors do.
+								// then, we can decrypt!
+								
+								System.out.println("~~~~~~~~~~~ MATCH! steckers: " + steckeredPairs + ", rotor positions: " + Arrays.toString(initialPositions));
+								enigmaMachine.setRotors(initialPositions);
+								
+								return enigmaMachine.decrypt(cipherText);
+							}
 						}
 					}
 				}

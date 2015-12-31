@@ -15,7 +15,7 @@ public class EnigmaBreakerTest {
 	// this could be any valid positions, but for the sake of a thorough test that exercises the most code, choosing { Z, Z, Z }
 	private static final char[] TEST_INITIAL_POSITIONS = new char[]{ 'Z', 'Z', 'Z' };
 	
-	private static final String TEST_PLAIN_TEXT = "KEINEBESONDERENEREIGNISSEHELLOWORLD";
+	private static final String TEST_PLAIN_TEXT = "ANXGENERALHELLOWORLD";
 	
 	@Test
 	public void testDecryptUnsteckered() {
