@@ -15,11 +15,13 @@ public class EnigmaBreakerTest {
 	// this could be any valid positions, but for the sake of a thorough test that exercises the most code, choosing { Z, Z, Z }
 	private static final char[] TEST_INITIAL_POSITIONS = new char[]{ 'Z', 'Z', 'Z' };
 	
+	private static final String TEST_PLAIN_TEXT = "KEINEBESONDERENEREIGNISSEHELLOWORLD";
+	
 	@Test
 	public void testDecryptUnsteckered() {
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM") ) );
+		assertEquals( TEST_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_PLAIN_TEXT) ) );
 	}
 	
 	@Test
@@ -30,8 +32,9 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+		assertEquals( TEST_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_PLAIN_TEXT), steckeredPairs.size() ) );
 	}
+	
 	
 	@Test
 	public void testDecryptTwoSteckerPair() {
@@ -41,9 +44,9 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+		assertEquals( TEST_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_PLAIN_TEXT), steckeredPairs.size() ) );
 	}
-	/*
+	
 	@Test
 	public void testDecryptThreeSteckerPair() {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
@@ -68,5 +71,5 @@ public class EnigmaBreakerTest {
 		
 		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
 	}
-	*/
+	
 }

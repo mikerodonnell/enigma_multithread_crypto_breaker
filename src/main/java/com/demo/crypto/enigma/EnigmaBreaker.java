@@ -3,10 +3,12 @@ package com.demo.crypto.enigma;
 import java.util.Arrays;
 import java.util.List;
 
+import com.demo.crypto.enigma.exception.DuplicateSteckerException;
 import com.demo.crypto.enigma.model.EnigmaMachine;
 import com.demo.crypto.enigma.model.SteckerCable;
-import com.demo.crypto.enigma.exception.DuplicateSteckerException;
+import com.demo.crypto.enigma.model.crib.Crib;
 import com.demo.crypto.enigma.util.Alphabet;
+import com.demo.crypto.enigma.util.CribGuesser;
 import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
 public class EnigmaBreaker {
@@ -26,14 +28,13 @@ public class EnigmaBreaker {
 	public static String decrypt( final String cipherText, int steckerPairCount ) {
 		System.out.println( "~~~~~~~ decrypting cipher text: " + cipherText );
 		
-		final String startingCrib = "HELLOWORLD";
-		final char[] startingCribArray = startingCrib.toCharArray();
+		final Crib crib = CribGuesser.getCribForMessage( cipherText );
 		
 		final EnigmaMachine enigmaMachine = new EnigmaMachine();
 		
 		char[] initialPositions = new char[3];
 		
-		String substring = cipherText.substring(0, startingCrib.length()); // the first 10 characters of the cipher text, see if it corresponds to the crib
+		String substring = cipherText.substring(0, crib.getPlainText().length); // the first X characters of the cipher text.
 		final char[] substringArray = substring.toCharArray();
 		
 		SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker(steckerPairCount);
@@ -65,7 +66,7 @@ public class EnigmaBreaker {
 						
 						enigmaMachine.setRotors(initialPositions);
 						
-						if( isMatchWithSettings(startingCribArray, substringArray, enigmaMachine) ) {
+						if( isMatchWithSettings(crib.getPlainText(), substringArray, enigmaMachine) ) {
 							// we found a match!!
 							// now that we know the correct settings, we need to set the rotors back to the last settings we tested, since each test pass turns the rotors.
 							// the steckers are fine; they don't move around each time we encipher a letter like the rotors do.
