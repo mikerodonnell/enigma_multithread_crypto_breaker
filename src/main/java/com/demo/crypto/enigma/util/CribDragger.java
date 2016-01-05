@@ -6,6 +6,7 @@ import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.demo.crypto.enigma.exception.NoMatchingCribException;
 import com.demo.crypto.enigma.model.crib.*;
 
 public class CribDragger {
@@ -19,14 +20,14 @@ public class CribDragger {
 	}
 	
 	
-	public static Crib getCribForMessage( final String cipherText ) {
+	public static Crib getCribForMessage( final String cipherText ) throws NoMatchingCribException {
 		if( StringUtils.isNotBlank(cipherText) )
 			return getCribForMessage( cipherText.toCharArray() );
 		
-		return null;
+		throw new NoMatchingCribException(cipherText);
 	}
 	
-	public static Crib getCribForMessage( final char[] cipherText ) {
+	public static Crib getCribForMessage( final char[] cipherText ) throws NoMatchingCribException {
 		
 		if( cipherText!=null && cipherText.length>0 ) {
 			for( Crib crib : KNOWN_CRIBS ) {
@@ -55,7 +56,7 @@ public class CribDragger {
 			}
 		}
 		
-		return null;
+		throw new NoMatchingCribException(new String(cipherText));
 	}
 	
 }
