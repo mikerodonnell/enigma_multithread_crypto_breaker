@@ -44,4 +44,10 @@ public class CribDraggerTest {
 			CribDragger.getCribForMessage("");
 		}
 	}
+	
+	@Test
+	public void testGetCribForMessageMultipleMatches() throws NoMatchingCribException {
+		// verify that we get the longest known crib here
+		assertTrue( CribDragger.getCribForMessage("ZZZZZZZZZZZZZZZZZZZZZZZZZ") instanceof NoSpecialOccurrences );
+	}
 }
