@@ -10,9 +10,6 @@ import com.demo.crypto.enigma.model.crib.ToGeneral;
 
 public class CribDraggerTest {
 
-	// TODO: figure out priority, what if 2 cribs match? probably use the longer one
-	
-	
 	@Test( expected=NoMatchingCribException.class )
 	public void testGetCribForMessageNoMatch() throws NoMatchingCribException {
 		try{
