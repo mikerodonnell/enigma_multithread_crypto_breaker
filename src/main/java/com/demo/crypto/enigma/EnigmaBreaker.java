@@ -1,7 +1,12 @@
 package com.demo.crypto.enigma;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.demo.crypto.enigma.exception.DuplicateSteckerException;
 import com.demo.crypto.enigma.exception.NoMatchingCribException;
@@ -9,10 +14,72 @@ import com.demo.crypto.enigma.model.EnigmaMachine;
 import com.demo.crypto.enigma.model.SteckerCable;
 import com.demo.crypto.enigma.model.crib.Crib;
 import com.demo.crypto.enigma.util.Alphabet;
+import com.demo.crypto.enigma.util.ConfigurationUtil;
 import com.demo.crypto.enigma.util.CribDragger;
 import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
 public class EnigmaBreaker {
+	
+	public static void main( final String[] arguments ) throws IOException {
+		System.out.println("First enter a plain text message, or select a number to choose one of these WWII samples:");
+		System.out.println("  1. ANXGENERALHELLOWORLD  (translation: To General...)");
+		System.out.println("  2. KEINEBESONDERENEREIGNISSE (translation: No sepecial occurrences)");
+		
+		BufferedReader reader = new BufferedReader( new InputStreamReader(System.in) );
+		String input = reader.readLine();
+		
+		String startPlainText = null;
+		if( "1".equals(input) )
+			startPlainText = "ANXGENERALHELLOWORLD"; // deciphers to ANXGENERALHELLOWORLD
+		else if( "2".equals(input) )
+			startPlainText = "KEINEBESONDERENEREIGNISSE";
+		else
+			startPlainText = input;
+		
+		input = null;
+		System.out.print("Now, enter a sequence of starting rotor positions, from left rotor to right. for example: ABC. Or, press enter for random positions.");
+		input = reader.readLine();
+		
+		char[] initialPositions = null;
+		if( StringUtils.isBlank(input) ) {
+			initialPositions = ConfigurationUtil.generateRandomRotorPositions();
+			System.out.println("Randomly chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
+		}
+		else {
+			initialPositions = ConfigurationUtil.getPositionsFromString(input);
+			System.out.println("Using your chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
+		}
+		
+		input = null;
+		System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");
+		System.out.println("(more than 3-4 steckers significantly increases processing time for decryption)");
+		input = reader.readLine();
+		int steckerPairCount = SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT;
+		if( StringUtils.isBlank(input) ) {
+			System.out.println("Using default of " + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + " stecker cables.");
+		}
+		else {
+			steckerPairCount = Integer.valueOf(input);
+			System.out.println("Using your chosen stecker count: " + steckerPairCount);
+		}
+		
+		List<SteckerCable> steckeredPairs = ConfigurationUtil.generateRandomSteckers(steckerPairCount);
+		System.out.println("Encrypting the chosen plain text with rotor positions " + Arrays.toString(initialPositions) + "and steckered pairs: " + steckeredPairs);
+		
+		EnigmaMachine enigmaMachine = new EnigmaMachine(initialPositions, steckeredPairs);
+		String cipherText = enigmaMachine.encrypt(startPlainText);
+		System.out.println("We encrypted your plain text " + startPlainText + " to " + cipherText + ", let's see if we can decrypt it back now by re-discovering the rotor and stecker settings.");
+		
+		String endPlainText = null;
+		try {
+			endPlainText = decrypt(cipherText);
+			System.out.println("Result: ");
+			System.out.println(endPlainText);
+		}
+		catch(NoMatchingCribException noMatchingCribException) {
+			System.out.println("Unable to decrypt this message. No known crib matches the message.");
+		}
+	}
 	
 	public static String decrypt( final String cipherText ) throws NoMatchingCribException {
 		return decrypt(cipherText, SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT);
@@ -56,7 +123,7 @@ public class EnigmaBreaker {
 			
 			if( steckeredPairs.isEmpty() )
 				System.out.println("~~~~~~~~~~~ attempting to break with no steckers");
-			else if( steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
+			else if( steckerCombinationTracker.getCombinationsCount() < 3 || steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
 				System.out.println("~~~~~~~~~~~ still working ... currently attempting to break with steckers: " + steckeredPairs);
 			
 			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
