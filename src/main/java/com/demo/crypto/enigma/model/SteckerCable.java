@@ -33,9 +33,20 @@ public class SteckerCable {
 	public boolean equals(Object testObject) {
 		if( testObject != null && testObject instanceof SteckerCable ) {
 			SteckerCable testSteckerCable = (SteckerCable) testObject;
-			return ( testSteckerCable.getInput()==input && testSteckerCable.getOutput()==output );
+			if ( testSteckerCable.getInput()==input && testSteckerCable.getOutput()==output || testSteckerCable.getInput()==output && testSteckerCable.getOutput()==input )
+				return true;
+			
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + input;
+		result = prime * result + output;
+		return result;
 	}
 }

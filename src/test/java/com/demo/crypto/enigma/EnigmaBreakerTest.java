@@ -1,8 +1,9 @@
 package com.demo.crypto.enigma;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -24,14 +25,18 @@ public class EnigmaBreakerTest {
 	public void testDecryptNoCrib() throws NoMatchingCribException {
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS );
 		
-		EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_UNBREAKABLE_PLAIN_TEXT) );
+		EnigmaBreaker EnigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_UNBREAKABLE_PLAIN_TEXT) );
+		EnigmaBreaker.decrypt();
 	}
 	
 	@Test
 	public void testDecryptUnsteckered() throws NoMatchingCribException {
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS );
 		
-		assertEquals( TEST_BREAKABLE_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT) ) );
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT) );
+		enigmaBreaker.decrypt();
+		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
+		assertTrue( enigmaBreaker.getSolvedSteckeredPairs().isEmpty() );
 	}
 	
 	@Test
@@ -42,9 +47,11 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( TEST_BREAKABLE_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() ) );
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() );
+		enigmaBreaker.decrypt();
+		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
+		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
-	
 	
 	@Test
 	public void testDecryptTwoSteckerPair() throws NoMatchingCribException {
@@ -54,9 +61,12 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( TEST_BREAKABLE_PLAIN_TEXT, EnigmaBreaker.decrypt( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() ) );
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() );
+		enigmaBreaker.decrypt();
+		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
+		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
-	/*
+	
 	@Test
 	public void testDecryptThreeSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
@@ -66,9 +76,12 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() );
+		enigmaBreaker.decrypt();
+		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
+		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
-	
+	/*
 	@Test
 	public void testDecryptFourSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
@@ -79,7 +92,10 @@ public class EnigmaBreakerTest {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
-		assertEquals( "HELLOWORLDIAMSAM", EnigmaBreaker.decrypt( enigmaMachine.encrypt("HELLOWORLDIAMSAM"), steckeredPairs.size() ) );
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_BREAKABLE_PLAIN_TEXT), steckeredPairs.size() );
+		enigmaBreaker.decrypt();
+		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
+		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
 	*/
 }

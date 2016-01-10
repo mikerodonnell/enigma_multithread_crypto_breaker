@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.demo.crypto.enigma.model.SteckerCable;
 
 public class ConfigurationUtil {
@@ -24,7 +26,10 @@ public class ConfigurationUtil {
 	}
 	
 	public static char[] getPositionsFromString( final String input ) { // TODO: validation
-		return input.toCharArray();
+		if( StringUtils.isNotBlank(input) )
+			return input.trim().toUpperCase().toCharArray();
+			
+		return new char[3];
 	}
 	
 	public static List<SteckerCable> generateRandomSteckers( int steckerCount ) {
