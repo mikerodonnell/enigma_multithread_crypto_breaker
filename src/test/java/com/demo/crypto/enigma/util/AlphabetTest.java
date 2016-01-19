@@ -8,9 +8,9 @@ public class AlphabetTest {
 
 	@Test
 	public void testNextCharacter() {
-		assertEquals( 'B', Alphabet.nextCharacter('A') );
-		assertEquals( 'Z', Alphabet.nextCharacter('Y') );
-		assertEquals( 'A', Alphabet.nextCharacter('Z') );
+		assertEquals( 'B', Alphabet.next('A') );
+		assertEquals( 'Z', Alphabet.next('Y') );
+		assertEquals( 'A', Alphabet.next('Z') );
 	}
 	
 }

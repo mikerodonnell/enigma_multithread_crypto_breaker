@@ -41,7 +41,11 @@ public class Alphabet {
 		return ALPHABET.get(character);
 	}
 	
-	public static char nextCharacter(char character) {
+	public static char next(char character) {
 		return ALPHABET_ARRAY[ (indexOf(character)+1) % 26 ];
+	}
+	
+	public static char afterNext(char character) {
+		return ALPHABET_ARRAY[ (indexOf(character)+2) % 26 ];
 	}
 }

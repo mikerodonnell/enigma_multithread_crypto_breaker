@@ -11,32 +11,29 @@ import org.junit.Test;
 import com.demo.crypto.enigma.model.SteckerCable;
 
 public class SteckerPairTrackerTest {
-	
-	private SteckerCombinationTracker steckerCombinationTracker;
-	
-	
+
 	@Test
 	public void testUnsteckered() {
-		steckerCombinationTracker = new SteckerCombinationTracker(0);
+		SteckerCombinationTracker tracker = new SteckerCombinationTracker(0);
 		
 		// with no stecker cables, the SteckerCombinationTracker should return exactly 1 List (an empty List) of stecker combinations.
-		assertTrue( steckerCombinationTracker.hasNext() );
-		assertTrue( steckerCombinationTracker.next().isEmpty() );
-		assertFalse( steckerCombinationTracker.hasNext() );
+		assertTrue( tracker.hasNext() );
+		assertTrue( tracker.next().isEmpty() );
+		assertFalse( tracker.hasNext() );
 	}
 	
 	@Test
 	public void testOnePair() {
-		steckerCombinationTracker = new SteckerCombinationTracker(1);
+		SteckerCombinationTracker tracker = new SteckerCombinationTracker(1);
 		
-		assertTrue( steckerCombinationTracker.hasNext() );
-		List<SteckerCable> steckerPairs = steckerCombinationTracker.next();
+		assertTrue( tracker.hasNext() );
+		List<SteckerCable> steckerPairs = tracker.next();
 		assertTrue( steckerPairs.isEmpty() );
 		
 		long possibleCombinationCount = getPossibleCombinationCount(1);
 		for( long count=1; count<=possibleCombinationCount; count++) {
-			assertTrue( steckerCombinationTracker.hasNext() );
-			steckerPairs = steckerCombinationTracker.next();
+			assertTrue( tracker.hasNext() );
+			steckerPairs = tracker.next();
 			
 			assertEquals( 1, steckerPairs.size() );
 			
@@ -59,23 +56,23 @@ public class SteckerPairTrackerTest {
 			}
 		}
 		
-		assertFalse( steckerCombinationTracker.hasNext() );
+		assertFalse( tracker.hasNext() );
 	}
 	
 	@Test
 	public void testNextNPairs() {
 		int numberOfPairs = 2;
 		
-		steckerCombinationTracker = new SteckerCombinationTracker(numberOfPairs);
+		SteckerCombinationTracker tracker = new SteckerCombinationTracker(numberOfPairs);
 		
-		assertTrue( steckerCombinationTracker.hasNext() );
-		List<SteckerCable> steckerPairs = steckerCombinationTracker.next();
+		assertTrue( tracker.hasNext() );
+		List<SteckerCable> steckerPairs = tracker.next();
 		assertTrue( steckerPairs.isEmpty() );
 		
 		long possibleCombinationCount = getPossibleCombinationCount(numberOfPairs);
 		for( long count=1; count<=possibleCombinationCount; count++) {
-			assertTrue( steckerCombinationTracker.hasNext() );
-			steckerPairs = steckerCombinationTracker.next();
+			assertTrue( tracker.hasNext() );
+			steckerPairs = tracker.next();
 			
 			assertEquals( numberOfPairs, steckerPairs.size() );
 			
@@ -100,7 +97,7 @@ public class SteckerPairTrackerTest {
 			}
 		}
 		
-		assertFalse( steckerCombinationTracker.hasNext() );
+		assertFalse( tracker.hasNext() );
 	}
 	
 	
@@ -112,12 +109,12 @@ public class SteckerPairTrackerTest {
 			 * outputs, while the input is B there are 24 possible outputs, while the input is Y there is 1 possible output, etc.
 			 * so this looks like:
 			 *   25 + 24 + 23 + 22 ... + 2 + 1
-			 *   which is equal to the Guass summation (25 * 25+1)/2
+			 *   which is equal to the Guass summation (25 * 25+1)/2 = 325
 			 */
 			possibleCombinationCount = 25*26/2;
 		}
 		else if(steckerCableCount==2)
-			possibleCombinationCount = 50315;
+			possibleCombinationCount = 49743;
 		// TODO: fill in up through n==10, and maybe come up with a mathematical formula for 1<n<=10
 			
 		return possibleCombinationCount;

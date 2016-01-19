@@ -16,8 +16,12 @@ public class EnigmaBreaker extends Thread {
 	
 	private String cipherText;
 	private int steckerPairCount;
+	private int parallelThreadIndex = 0;
+	private int parallelThreadCount = 1; // valid values: 1, 2, 4, 8
+	private int slowRotorStartIndex = 0;
+	private int slowRotorEndIndex = 25;
 	
-	private volatile char[] solvedPositions = new char[3];
+	private volatile char[] solvedPositions = null;//new char[3];
 	private volatile List<SteckerCable> solvedSteckeredPairs = null;
 	
 	public EnigmaBreaker( final String cipherText ) {
@@ -25,8 +29,71 @@ public class EnigmaBreaker extends Thread {
 	}
 	
 	public EnigmaBreaker( final String cipherText, int steckerPairCount ) {
+		this( cipherText, steckerPairCount, 0, 1 );
+	}
+	
+	public EnigmaBreaker( final String cipherText, int steckerPairCount, int parallelThreadIndex, int parallelThreadCount ) {
 		this.cipherText = cipherText;
 		this.steckerPairCount = steckerPairCount;
+		this.parallelThreadIndex = parallelThreadIndex;
+		this.parallelThreadCount = parallelThreadCount;
+		
+		if(parallelThreadCount==2) {
+			if(parallelThreadIndex==0) {
+				slowRotorEndIndex = 12;
+			}
+			else {
+				slowRotorStartIndex = 13;
+			}
+		}
+		else if(parallelThreadCount==4) {
+			if(parallelThreadIndex==0) {
+				slowRotorEndIndex = 6;
+			}
+			else if(parallelThreadIndex==1) {
+				slowRotorStartIndex = 7;
+				slowRotorEndIndex = 13;
+			}
+			else if(parallelThreadIndex==2) {
+				slowRotorStartIndex = 14;
+				slowRotorEndIndex = 19;
+			}
+			else {
+				slowRotorStartIndex = 20;
+			}
+		}
+		else if(parallelThreadCount==8) {
+			if(parallelThreadIndex==0) {
+				slowRotorEndIndex = 3;
+			}
+			else if(parallelThreadIndex==1) {
+				slowRotorStartIndex = 4;
+				slowRotorEndIndex = 7;
+			}
+			else if(parallelThreadIndex==2) {
+				slowRotorStartIndex = 8;
+				slowRotorEndIndex = 10;
+			}
+			else if(parallelThreadIndex==3) {
+				slowRotorStartIndex = 11;
+				slowRotorEndIndex = 13;
+			}
+			else if(parallelThreadIndex==4) {
+				slowRotorStartIndex = 14;
+				slowRotorEndIndex = 16;
+			}
+			else if(parallelThreadIndex==5) {
+				slowRotorStartIndex = 17;
+				slowRotorEndIndex = 19;
+			}
+			else if(parallelThreadIndex==6) {
+				slowRotorStartIndex = 20;
+				slowRotorEndIndex = 22;
+			}
+			else {
+				slowRotorStartIndex = 23;
+			}
+		}
 	}
 	
 	@Override
@@ -50,13 +117,14 @@ public class EnigmaBreaker extends Thread {
 	 * @param steckerPairCount the number of stecker pairs used in the Enigma machine. regardless of this value, an unsteckered configuration is always attempted first.
 	 * @return the plain text corresponding to the given cipher text.
 	 * @throws NoMatchingCribException 
+	 * @throws InterruptedException 
 	 */
 	public void decrypt() throws NoMatchingCribException {
-		System.out.println( "~~~~~~~ decrypting cipher text: " + cipherText );
+		log("decrypting cipher text: " + cipherText);
 		
 		final Crib crib = CribDragger.getCribForMessage( cipherText ); // throws NoMatchingCribException, let it bubble up
 		
-		System.out.println( "~~~~~~~ using crib: " + crib );
+		log("using crib: " + crib);
 		final EnigmaMachine enigmaMachine = new EnigmaMachine();
 		
 		char[] initialPositions = new char[3];
@@ -66,7 +134,7 @@ public class EnigmaBreaker extends Thread {
 		
 		SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker(steckerPairCount);
 		
-		while( steckerCombinationTracker.hasNext() ) {
+		while( !interrupted() && steckerCombinationTracker.hasNext() ) {
 			List<SteckerCable> steckeredPairs = steckerCombinationTracker.next();
 			try {
 				enigmaMachine.setSteckers(steckeredPairs);
@@ -77,12 +145,12 @@ public class EnigmaBreaker extends Thread {
 			}
 			
 			if( steckeredPairs.isEmpty() )
-				System.out.println("~~~~~~~~~~~ attempting to break with no steckers");
+				log("attempting to break with no steckers");
 			else if( steckerCombinationTracker.getCombinationsCount() < 3 || steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
-				System.out.println("~~~~~~~~~~~ thread " + getId() + " still working ... currently attempting to break with steckers: " + steckeredPairs);
+				log("still working ... currently attempting steckers: " + steckeredPairs);
 			
 			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
-			for( int slowRotorIndex=0; slowRotorIndex<26; slowRotorIndex++ ) {
+			for( int slowRotorIndex=slowRotorStartIndex; slowRotorIndex<=slowRotorEndIndex; slowRotorIndex++ ) {
 				initialPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
 				
 				for( int middleRotorIndex=0; middleRotorIndex<26; middleRotorIndex++ ) {
@@ -97,7 +165,7 @@ public class EnigmaBreaker extends Thread {
 							// we found a match!!
 							// record the correct configuration to member variables so that EnigmaBreakerControl can retrieve them via #getSolvedPositions() and #getSolvedSteckerPairs()
 							// then, EnigmaBreakerControl can decrypt!
-							System.out.println("~~~~~~~~~~~ MATCH! steckers: " + steckeredPairs + ", rotor positions: " + Arrays.toString(initialPositions));
+							log("match found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(initialPositions));
 							
 							this.solvedPositions = initialPositions;
 							this.solvedSteckeredPairs = steckeredPairs;
@@ -118,5 +186,33 @@ public class EnigmaBreaker extends Thread {
 		}
 		
 		return true;
+	}
+	
+	private void log( final String message ) {
+		System.out.println(this + ": " + message);
+	}
+	
+	@Override
+	public String toString() {
+		return "thread " + (parallelThreadIndex+1) + " of " + parallelThreadCount;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + parallelThreadIndex;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if( obj!=null && obj instanceof EnigmaBreaker ) {
+			EnigmaBreaker other = (EnigmaBreaker) obj;
+			return (this.parallelThreadIndex == other.parallelThreadIndex);
+		}
+		
+		return false;
 	}
 }

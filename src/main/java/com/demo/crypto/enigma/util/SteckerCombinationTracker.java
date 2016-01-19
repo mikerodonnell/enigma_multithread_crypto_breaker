@@ -59,11 +59,12 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 				for( int index=steckerPairCount-1; index>=0; index-- ) {
 					SteckerCable cable = currentPairs.get(index);
 					
+					// lastInputForThisCable tracks how far right we need to move a cable ... not all the way to YZ unless we only have 1 total cable.
 					// if index=2 and steckerPairCount=3, lastInputForThisCable = Y (index 24)
 					// if index=1 and steckerPairCount=3, lastInputForThisCable = W (index 22)
 					// if index=0 and steckerPairCount=3, lastInputForThisCable = U (index 20)
 					char lastInputForThisCable = Alphabet.ALPHABET_ARRAY[25-2*(steckerPairCount-1-index)-1];
-					char lastOutForThisCable = Alphabet.nextCharacter(lastInputForThisCable);
+					char lastOutForThisCable = Alphabet.next(lastInputForThisCable);
 					
 					if( cable.getInput() != lastInputForThisCable || cable.getOutput() != lastOutForThisCable ) {
 						hasCableThatCanMove = true;
@@ -86,26 +87,29 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 			currentPairs = new ArrayList<SteckerCable>();
 		}
 		else if( currentPairs.isEmpty() ) {
-			
-			if( steckerPairCount >=1 )
+			if( steckerPairCount >=1 ) {
 				currentPairs.add( new SteckerCable('A', 'B') );
 			
-			if( steckerPairCount >=2 )
-				currentPairs.add( new SteckerCable('C', 'D') );
-			
-			if( steckerPairCount >=3 )
-				currentPairs.add( new SteckerCable('E', 'F') );
-			
-			if( steckerPairCount >=4 )
-				currentPairs.add( new SteckerCable('G', 'H') );
+				// now, plug the rest of the stecker cables into their starting positions. though the leftmost can can be anywhere depending on the parallelThreadIndex, the 
+				// rest of the cables always start immediately to the right.
+				for( int index=0; index<steckerPairCount-1; index++ )
+					currentPairs.add( new SteckerCable(Alphabet.next(currentPairs.get(index).getOutput()), Alphabet.afterNext(currentPairs.get(index).getOutput())) );
+			}
 		}
 		else {
 			for(int index=currentPairs.size()-1; index>=0; index--) {
+				boolean isLeftCableInputChanging = ( index>0 && ('Z' == currentPairs.get(index-1).getOutput()) );
+				
 				if( incrementCableAtIndex(index) || index==0 )
 					break;
 				
-				char nextRightInput = Alphabet.nextCharacter(currentPairs.get(index-1).getInput());
-				char nextRightOutput = Alphabet.nextCharacter(nextRightInput);
+				char nextRightInput = Alphabet.next(currentPairs.get(index-1).getInput());
+				
+				if(isLeftCableInputChanging)
+					nextRightInput = Alphabet.next(Alphabet.next(nextRightInput));
+				
+				char nextRightOutput = Alphabet.next(nextRightInput);
+				
 				currentPairs.set( index, new SteckerCable(nextRightInput, nextRightOutput) );
 			}
 		}
@@ -117,16 +121,16 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 	private boolean incrementCableAtIndex( int index ) {
 		SteckerCable steckerCable = currentPairs.get(index);
 		
-		if(steckerCable.getOutput() =='Z') {
+		if(steckerCable.getOutput() == 'Z') {
 			
 			if( steckerCable.getInput() == 'Y' )
 				return false;
 			
-			steckerCable.setInput( Alphabet.nextCharacter(steckerCable.getInput()) );
-			steckerCable.setOutput( Alphabet.nextCharacter(steckerCable.getInput()) );
+			steckerCable.setInput( Alphabet.next(steckerCable.getInput()) );
+			steckerCable.setOutput( Alphabet.next(steckerCable.getInput()) );
 		}
 		else {
-			steckerCable.setOutput( Alphabet.nextCharacter(steckerCable.getOutput()) );
+			steckerCable.setOutput( Alphabet.next(steckerCable.getOutput()) );
 		}
 		
 		return true;

@@ -32,6 +32,20 @@
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.19</version>
+					<configuration>
+						<trimStackTrace>false</trimStackTrace>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.4.0</version>
+					<configuration>
+						<executable>java</executable>
+						<mainClass>com.demo.crypto.enigma.EnigmaBreakerControl</mainClass>
+						<argument>-classpath</argument>
+						<classpath/>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

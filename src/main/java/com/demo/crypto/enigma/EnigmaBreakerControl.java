@@ -82,7 +82,7 @@ public class EnigmaBreakerControl {
 		
 		List<EnigmaBreaker> enigmaBreakers = new ArrayList<EnigmaBreaker>();
 		for( int index=0; index<threadCount; index++ ) {
-			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckerPairCount);
+			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckerPairCount, index, threadCount);
 			enigmaBreakers.add( enigmaBreaker );
 			enigmaBreaker.start();
 		}
@@ -92,37 +92,42 @@ public class EnigmaBreakerControl {
 		
 		while(true) {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 			EnigmaBreaker stoppedEnigmaBreaker = null;
+			boolean stillRunning = false;
 			for( EnigmaBreaker enigmaBreaker : enigmaBreakers ) {
-				if( !enigmaBreaker.isAlive() ) {
+				if( enigmaBreaker.getSolvedPositions()!=null ) {
 					stoppedEnigmaBreaker = enigmaBreaker;
 					break;
 				}
 			}
 			
-			if( stoppedEnigmaBreaker==null )
-				System.out.println("~~~~~~~~~~~ all threads are still running...");
-			else {
-				// TODO: we can't just check that a thread has stopped, we have to check if it actually returned a result
-				// TODO: toString() and Equals based on index 1 of 4, etc.
-				System.out.println("~~~~~~~~~~~ thread " + stoppedEnigmaBreaker + " has returned with results! interrupting other threads now.");
-				
-				for( EnigmaBreaker enigmaBreaker : enigmaBreakers ) { // first interrupt any remaining live threads
-					if( enigmaBreaker.isAlive() )
-						enigmaBreaker.interrupt();
+			if( stoppedEnigmaBreaker==null ) {
+				for( EnigmaBreaker enigmaBreaker : enigmaBreakers ) {
+					if( enigmaBreaker.isAlive() ) {
+						stillRunning = true;
+						break;
+					}
 				}
+			}
+			
+			if( stoppedEnigmaBreaker!=null ) {
+				System.out.println(stoppedEnigmaBreaker + " has returned with results! interrupting other threads now.");
+				
+				for( EnigmaBreaker enigmaBreaker : enigmaBreakers ) // first interrupt any remaining live threads
+					enigmaBreaker.interrupt();
 				
 				// then pull the solved positions info from the thread that returned successfully
-				System.out.println("~~~~~~~~~~~ solvedPositions: " + Arrays.toString(stoppedEnigmaBreaker.getSolvedPositions()));
 				solvedPositions = stoppedEnigmaBreaker.getSolvedPositions();
-				System.out.println("~~~~~~~~~~~ solvedSteckeredPairs: " + stoppedEnigmaBreaker.getSolvedSteckeredPairs());
 				solvedSteckeredPairs = stoppedEnigmaBreaker.getSolvedSteckeredPairs();
 				break;
+			}
+			else if(!stillRunning) {
+				System.out.println("no solution found!");
 			}
 		}
 		
@@ -130,7 +135,7 @@ public class EnigmaBreakerControl {
 		enigmaMachine.setSteckers(solvedSteckeredPairs);
 		
 		endPlainText = enigmaMachine.decrypt(cipherText);
-		System.out.println("~~~~~~~~~~~ End plain text: " + endPlainText);
+		System.out.println("End plain text: " + endPlainText);
 	}
 	
 }
