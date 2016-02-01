@@ -25,11 +25,27 @@ public class ConfigurationUtil {
 		return rotorPositions;
 	}
 	
-	public static char[] getPositionsFromString( final String input ) { // TODO: validation
-		if( StringUtils.isNotBlank(input) )
-			return input.trim().toUpperCase().toCharArray();
+	public static char[] getPositionsFromString( final String input ) {
+		String trimmedInput = StringUtils.stripToNull(input);
+		if( trimmedInput!=null && trimmedInput.length()==3 && StringUtils.isAlpha(trimmedInput) )
+			return trimmedInput.toUpperCase().toCharArray();
 			
-		return new char[3];
+		throw new IllegalArgumentException("Initial positions must be specified with 3 letters. ex: ARH");
+	}
+	
+	public static List<SteckerCable> generateRandomSteckers( final String input ) {
+		int steckerCount = -1;
+		try {
+			steckerCount = Integer.valueOf(input);
+		}
+		catch(NumberFormatException numberFormatException) {
+			throw new IllegalArgumentException("Must be a number between 0 and 10.");
+		}
+		
+		if( steckerCount<0 || steckerCount>10 )
+			throw new IllegalArgumentException("Must be a number between 0 and 10.");
+		
+		return generateRandomSteckers(steckerCount);
 	}
 	
 	public static List<SteckerCable> generateRandomSteckers( int steckerCount ) {
@@ -52,4 +68,19 @@ public class ConfigurationUtil {
 		return steckeredPairs;
 	}
 	
+	public static int validateThreadCount( final String input ) {
+		int threadCount = 1;
+		
+		try {
+			threadCount = Integer.valueOf(input);
+		}
+		catch(NumberFormatException numberFormatException) {
+			throw new IllegalArgumentException("Must be 1, 2, 4, or 8");
+		}
+		
+		if( threadCount!=1 && threadCount!=2 && threadCount!=4 && threadCount!=8 )
+			throw new IllegalArgumentException("Unsupported number of threads. Must be 1, 2, 4, or 8");
+		
+		return threadCount;
+	}
 }

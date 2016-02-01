@@ -66,7 +66,7 @@ public class EnigmaBreakerTest {
 		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
 		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
-	
+	/*
 	@Test
 	public void testDecryptThreeSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
@@ -81,7 +81,7 @@ public class EnigmaBreakerTest {
 		assertArrayEquals( TEST_INITIAL_POSITIONS, enigmaBreaker.getSolvedPositions() );
 		assertEquals( new HashSet<SteckerCable>(steckeredPairs), new HashSet<SteckerCable>(enigmaBreaker.getSolvedSteckeredPairs()) );
 	}
-	/*
+	
 	@Test
 	public void testDecryptFourSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();

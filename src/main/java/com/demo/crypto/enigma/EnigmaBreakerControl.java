@@ -20,6 +20,7 @@ public class EnigmaBreakerControl {
 		System.out.println("First enter a plain text message, or select a number to choose one of these WWII samples:");
 		System.out.println("  1. ANXGENERALHELLOWORLD  (translation: To General...)");
 		System.out.println("  2. KEINEBESONDERENEREIGNISSE (translation: No sepecial occurrences)");
+		System.out.print("  => ");
 		
 		BufferedReader reader = new BufferedReader( new InputStreamReader(System.in) );
 		String input = reader.readLine();
@@ -32,57 +33,31 @@ public class EnigmaBreakerControl {
 		else
 			startPlainText = input;
 		
-		input = null;
-		System.out.print("Now, enter a sequence of starting rotor positions, from left rotor to right. for example: ABC. Or, press enter for random positions: ");
-		input = reader.readLine();
+		char[] initialPositions = getInitialPositions(reader);
 		
-		char[] initialPositions = null;
-		if( StringUtils.isBlank(input) ) {
-			initialPositions = ConfigurationUtil.generateRandomRotorPositions();
-			System.out.println("Randomly chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
-		}
-		else {
-			initialPositions = ConfigurationUtil.getPositionsFromString(input);
-			System.out.println("Using your chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
-		}
+		List<SteckerCable> steckeredPairs = getSteckeredPairs(reader);
 		
-		input = null;
-		System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");
-		System.out.println("(more than 3-4 steckers significantly increases processing time for decryption)");
-		input = reader.readLine();
-		int steckerPairCount = SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT;
-		if( StringUtils.isBlank(input) ) {
-			System.out.println("Using default of " + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + " stecker cables.");
+		System.out.println("\nEncrypting the chosen plain text with rotor positions " + Arrays.toString(initialPositions) + " and steckered pairs: " + steckeredPairs);
+		for( int timer=0; timer<startPlainText.length(); timer++) {
+			try {
+				System.out.print("* ");
+				Thread.sleep(25);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		else {
-			steckerPairCount = Integer.valueOf(input);
-			System.out.println("Using your chosen stecker count: " + steckerPairCount);
-		}
-		
-		List<SteckerCable> steckeredPairs = ConfigurationUtil.generateRandomSteckers(steckerPairCount);
-		System.out.println("Encrypting the chosen plain text with rotor positions " + Arrays.toString(initialPositions) + " and steckered pairs: " + steckeredPairs);
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine(initialPositions, steckeredPairs);
 		String cipherText = enigmaMachine.encrypt(startPlainText);
-		System.out.println("We encrypted your plain text " + startPlainText + " to " + cipherText + ", let's see if we can decrypt it back now by re-discovering the rotor and stecker settings.");
+		System.out.println("\n\nWe encrypted your plain text " + startPlainText + " to " + cipherText + ". Now, let's see if we can decrypt it back now by re-discovering the rotor and stecker settings (these settings are Enigma's encryption 'key').");
 		
-		input = null;
-		System.out.print("Enter the number of parallel threads you'd like to use for for breaking the cipher, 1 through 4. Or press enter to use the default (1). ");
-		input = reader.readLine();
-		int threadCount = 1;
-		if( StringUtils.isBlank(input) ) {
-			System.out.println("Using default of 1 thread.");
-		}
-		else {
-			threadCount = Integer.valueOf(input);
-			System.out.println("Using your chosen thread count: " + threadCount);
-		}
+		int threadCount = getThreadCount(reader);
 		
 		String endPlainText = null;
 		
 		List<EnigmaBreaker> enigmaBreakers = new ArrayList<EnigmaBreaker>();
 		for( int index=0; index<threadCount; index++ ) {
-			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckerPairCount, index, threadCount);
+			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckeredPairs.size(), index, threadCount);
 			enigmaBreakers.add( enigmaBreaker );
 			enigmaBreaker.start();
 		}
@@ -137,5 +112,89 @@ public class EnigmaBreakerControl {
 		endPlainText = enigmaMachine.decrypt(cipherText);
 		System.out.println("End plain text: " + endPlainText);
 	}
+
+
+	private static char[] getInitialPositions( final BufferedReader reader ) throws IOException {
+		char[] initialPositions = null;
+		
+		while(true) {
+			System.out.println("Now, enter a sequence of starting rotor positions, from left rotor to right. for example: ARH. Or, press enter for random positions: ");
+			System.out.print("  => ");
+			String input = reader.readLine();
+			
+			if( StringUtils.isBlank(input) ) {
+				initialPositions = ConfigurationUtil.generateRandomRotorPositions();
+				System.out.println("Randomly chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
+				break;
+			}
+			else {
+				try {
+					initialPositions = ConfigurationUtil.getPositionsFromString(input);
+					System.out.println("Using your chosen rotor positions to encrypt with: " + Arrays.toString(initialPositions));
+					break;
+				}
+				catch(IllegalArgumentException illegalArgumentException) {
+					System.out.println( illegalArgumentException.getMessage() );
+				}
+			}
+		}
 	
+		return initialPositions;
+	}
+	
+	
+	private static List<SteckerCable> getSteckeredPairs( final BufferedReader reader ) throws IOException {
+		List<SteckerCable> steckeredPairs = null;
+		
+		while(true) {
+			System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");
+			System.out.println(" *tip: more than 3-4 steckers significantly increases processing time for decryption.");
+			System.out.print("  => ");
+			String input = reader.readLine();
+			if( StringUtils.isBlank(input) ) {
+				System.out.println("Using default of " + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + " stecker cables.");
+				break;
+			}
+			else {
+				try {
+					steckeredPairs = ConfigurationUtil.generateRandomSteckers(input);
+					System.out.println("Using your chosen stecker count: " + input);
+					break;
+				}
+				catch(IllegalArgumentException illegalArgumentException) {
+					System.out.println( illegalArgumentException.getMessage() );
+				}
+			}
+		}
+		
+		return steckeredPairs;
+	}
+	
+	
+	private static int getThreadCount( final BufferedReader reader ) throws IOException {
+		int threadCount = 1;
+		
+		while(true) {
+			System.out.println("Enter the number of parallel threads you'd like to use for for breaking the cipher; 1, 2, 4, or 8. Or press enter to use the default (1). ");
+			System.out.println(" *tip: use one thread per CPU core for fastest cipher break.");
+			System.out.print("  => ");
+			String input = reader.readLine();
+			if( StringUtils.isBlank(input) ) {
+				System.out.println("Using default of 1 thread.");
+				break;
+			}
+			else {
+				try {
+					threadCount = ConfigurationUtil.validateThreadCount(input);
+					System.out.println("Using your chosen thread count: " + threadCount);
+					break;
+				}
+				catch(IllegalArgumentException illegalArgumentException) {
+					System.out.println( illegalArgumentException.getMessage() );
+				}
+			}
+		}
+		
+		return threadCount;
+	}
 }

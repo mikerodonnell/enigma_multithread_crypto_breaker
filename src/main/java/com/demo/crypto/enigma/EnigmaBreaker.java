@@ -146,8 +146,8 @@ public class EnigmaBreaker extends Thread {
 			
 			if( steckeredPairs.isEmpty() )
 				log("attempting to break with no steckers");
-			else if( steckerCombinationTracker.getCombinationsCount() < 3 || steckerCombinationTracker.getCombinationsCount() % 2000 == 0 )
-				log("still working ... currently attempting steckers: " + steckeredPairs);
+			else if( steckerCombinationTracker.getCombinationsCount() < 3 || steckerCombinationTracker.getCombinationsCount() % 2500 == 0 )
+				log("still working ... currently attempting steckers: " + steckeredPairs + ", and rotor range " + Alphabet.ALPHABET_ARRAY[slowRotorStartIndex] + " through " + Alphabet.ALPHABET_ARRAY[slowRotorEndIndex]);
 			
 			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
 			for( int slowRotorIndex=slowRotorStartIndex; slowRotorIndex<=slowRotorEndIndex; slowRotorIndex++ ) {
@@ -165,7 +165,7 @@ public class EnigmaBreaker extends Thread {
 							// we found a match!!
 							// record the correct configuration to member variables so that EnigmaBreakerControl can retrieve them via #getSolvedPositions() and #getSolvedSteckerPairs()
 							// then, EnigmaBreakerControl can decrypt!
-							log("match found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(initialPositions));
+							log("encryption key found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(initialPositions));
 							
 							this.solvedPositions = initialPositions;
 							this.solvedSteckeredPairs = steckeredPairs;
