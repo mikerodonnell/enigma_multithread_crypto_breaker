@@ -56,8 +56,8 @@ public class EnigmaBreakerControl {
 		String endPlainText = null;
 		
 		List<EnigmaBreaker> enigmaBreakers = new ArrayList<EnigmaBreaker>();
-		for( int index=0; index<threadCount; index++ ) {
-			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckeredPairs.size(), index, threadCount);
+		for( int threadIndex=0; threadIndex<threadCount; threadIndex++ ) {
+			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckeredPairs.size(), threadIndex, threadCount);
 			enigmaBreakers.add( enigmaBreaker );
 			enigmaBreaker.start();
 		}

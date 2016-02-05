@@ -1,5 +1,10 @@
 package com.demo.crypto.enigma.model;
 
+/**
+ * a representation of a single Enigma steckerbrett (plugboard) cable. 
+ * 
+ * @author mikerodonnell
+ */
 public class SteckerCable {
 
 	private char input;

@@ -1,7 +1,7 @@
 package com.demo.crypto.enigma.model;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.demo.crypto.enigma.exception.DuplicateSteckerException;
@@ -9,15 +9,18 @@ import com.demo.crypto.enigma.exception.InvalidConfigurationException;
 
 public class Steckerbrett {
 	
+	/** the mapping of substitution pair letters representing the Steckerbrett's wiring state. this is maintained reflexively -- if A=>B is added then 
+	 * B=>A should also be added.
+	 */
 	private Map<Character, Character> steckeredPairs = new HashMap<Character, Character>();
 
 	Steckerbrett() { }
 	
-	Steckerbrett( List<SteckerCable> steckeredPairs ) {
+	Steckerbrett( Collection<SteckerCable> steckeredPairs ) {
 		stecker(steckeredPairs);
 	}
 	
-	public void stecker( final List<SteckerCable> steckeredPairs ) {
+	public void stecker( final Collection<SteckerCable> steckeredPairs ) {
 		if( steckeredPairs != null && !steckeredPairs.isEmpty() ) {
 			if( steckeredPairs.size() > 10 )
 				throw new InvalidConfigurationException("a maximum of 10 steckered pairs is supported.");
@@ -48,6 +51,7 @@ public class Steckerbrett {
 		
 		if( steckeredPairs.containsKey(original) )
 			retval = steckeredPairs.get(original);
+		// we don't have to check steckeredPairs.values().contains(original) because steckeredPairs is maintained reflexively.
 		
 		return retval;
 	}

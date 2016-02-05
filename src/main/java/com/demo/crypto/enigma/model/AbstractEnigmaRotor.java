@@ -44,6 +44,13 @@ public abstract class AbstractEnigmaRotor implements Steppable {
 		return turnoverCharacter;
 	}
 	
+	/**
+	 * get the index (0 through 25) of the letter of the alphabet that this rotor outputs for the given input index, when current is running forward (right to left) 
+	 * through the Enigma circuit.
+	 * 
+	 * @param absoluteInputIndex
+	 * @return
+	 */
 	public int getOutputIndex( int absoluteInputIndex ) {
 		// the value of absoluteInputIndex assumes a static 'A' rotor position where 0 is at the top. if the rotor has any offset currently, 
 		// we have to add the offset.
@@ -52,12 +59,23 @@ public abstract class AbstractEnigmaRotor implements Steppable {
 		return ((26 + Alphabet.indexOf(substituteCharacter) - getOffset()) % 26 ); // now we have to add 26 and mod 26 again because the subtracted offset might have put us under 0
 	}
 	
+	/**
+	 * get the index (0 through 25) of the letter of the alphabet that this rotor outputs for the given input index, when current is running backward (left to right) 
+	 * through the Enigma circuit.
+	 * 
+	 * @param absoluteInputIndex
+	 * @return
+	 */
 	public int getOutputIndexInverse( int absoluteInputIndex ) {
 		int effectiveInputIndex = (absoluteInputIndex + getOffset()) % 26; // we have to mod 26 here because the added offset might have put us over 25
 		char originalCharacter = Alphabet.ALPHABET_ARRAY[effectiveInputIndex];
 		return ( (26 + ArrayUtils.indexOf(substitutions, originalCharacter) - getOffset()) % 26 ); // now we have to add 26 and mod 26 again because the subtracted offset might have put us under 0
 	}
 	
+	/**
+	 * modifies the state of this rotor by advancing it one position. depending on the value of turnoverCharacter, this may also advance the rotor to the left of 
+	 * this one.
+	 */
 	public void step() {
 		offset++;
 		
@@ -66,10 +84,6 @@ public abstract class AbstractEnigmaRotor implements Steppable {
 		
 		if( offset > 25)
 			offset = 0;
-	}
-	
-	protected char[] getSubstitutions() {
-		return this.substitutions;
 	}
 	
 }

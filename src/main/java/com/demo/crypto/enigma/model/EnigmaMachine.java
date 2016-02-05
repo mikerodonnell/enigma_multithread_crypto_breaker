@@ -1,6 +1,6 @@
 package com.demo.crypto.enigma.model;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.demo.crypto.enigma.util.Alphabet;
 
@@ -8,7 +8,7 @@ public class EnigmaMachine {
 
 	private static final char[] DEFAULT_INITIAL_POSITIONS = {'A','A','A'};
 	private final char[] initialPositions;
-	private List<SteckerCable> initialSteckeredPairs;
+	private Collection<SteckerCable> initialSteckeredPairs;
 	
 	private AbstractEnigmaRotor slowRotor;
 	private AbstractEnigmaRotor middleRotor;
@@ -24,7 +24,7 @@ public class EnigmaMachine {
 		this( initialPositions, null );
 	}
 	
-	public EnigmaMachine( char[] initialPositions, List<SteckerCable> steckeredPairs ) {
+	public EnigmaMachine( char[] initialPositions, Collection<SteckerCable> steckeredPairs ) {
 		this.initialPositions = initialPositions;
 		this.initialSteckeredPairs = steckeredPairs;
 		
@@ -37,38 +37,70 @@ public class EnigmaMachine {
 		steckerbrett = new Steckerbrett(steckeredPairs);
 	}
 	
-	public void setRotors( char[] initialPositions ) {
-		fastRotor.setOffset( Alphabet.indexOf(initialPositions[2]) );
-		middleRotor.setOffset( Alphabet.indexOf(initialPositions[1]) );
-		slowRotor.setOffset( Alphabet.indexOf(initialPositions[0]) );
+	/**
+	 * set this Enigma machine's rotors to the given rotor positions. rotorPositions[0] maps to the slow (rightmost) rotor.
+	 * 
+	 * @param rotorPositions
+	 */
+	public void setRotors( char[] rotorPositions ) {
+		fastRotor.setOffset( Alphabet.indexOf(rotorPositions[2]) );
+		middleRotor.setOffset( Alphabet.indexOf(rotorPositions[1]) );
+		slowRotor.setOffset( Alphabet.indexOf(rotorPositions[0]) );
 	}
 	
-	public void setSteckers( final List<SteckerCable> steckeredPairs ) {
+	/**
+	 * set up this Enigma machine's steckerboard from with the given SteckerCables. this is not additive; any extant steckers are removed before plugging in the new SteckerCables.
+	 * 
+	 * @param steckeredPairs
+	 */
+	public void setSteckers( final Collection<SteckerCable> steckeredPairs ) {
 		steckerbrett.clear();
 		steckerbrett.stecker(steckeredPairs);
 	}
 	
+	/**
+	 * reset this Enigma machine back to its initial. this does NOT reset the rotors to the A position or clear the steckerboard -- just reset to the state this EnigmaMachine's
+	 * instantiation state.
+	 */
 	public void reset() {
-		fastRotor.setOffset( Alphabet.indexOf(initialPositions[2]) );
-		middleRotor.setOffset( Alphabet.indexOf(initialPositions[1]) );
-		slowRotor.setOffset( Alphabet.indexOf(initialPositions[0]) );
+		setRotors(initialPositions);
 		
 		steckerbrett.clear();
 		steckerbrett.stecker(initialSteckeredPairs);
 	}
 	
+	/**
+	 * an alias for {@link #encrypt(String)}
+	 * 
+	 * @param cipherText
+	 * @return
+	 * @see #encrypt(String)
+	 */
 	public String decrypt( final String cipherText ) { // just an alias #encrypt()
 		return encrypt(cipherText);
 	}
 	
+	/**
+	 * encrypt the given plain text letter-by-letter based on the current state of this Enigma machine.
+	 * 
+	 * @param plainText
+	 * @return
+	 * @see #decrypt(String)
+	 */
 	public String encrypt( final String plainText ) {
 		StringBuilder stringBuilder = new StringBuilder();
-		for( int index=0; index<plainText.length(); index++ )
-			stringBuilder.append( encrypt( plainText.charAt(index) ) );
+		for( char character : plainText.toCharArray() )
+			stringBuilder.append( encrypt(character) );
 		
 		return stringBuilder.toString();
 	}
 	
+	/**
+	 * encipher the given letter based on the current state of this Enigma machine.
+	 * 
+	 * @param input
+	 * @return
+	 */
 	public char encrypt( char input ) {
 		fastRotor.step();
 		
@@ -82,6 +114,12 @@ public class EnigmaMachine {
 		return steckerbrett.getSteckeredCharacter( Alphabet.ALPHABET_ARRAY[indexToLightBoard] );
 	}
 	
+	/**
+	 * an alias for {@link #encrypt(char)}
+	 * 
+	 * @param cipherCharacter
+	 * @return
+	 */
 	public char decrypt( char cipherCharacter ) { // just an alias for #encrypt()
 		return encrypt(cipherCharacter);
 	}

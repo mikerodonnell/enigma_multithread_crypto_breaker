@@ -18,11 +18,11 @@ public class EnigmaBreaker extends Thread {
 	private int steckerPairCount;
 	private int parallelThreadIndex = 0;
 	private int parallelThreadCount = 1; // valid values: 1, 2, 4, 8
-	private int slowRotorStartIndex = 0;
-	private int slowRotorEndIndex = 25;
+	private int slowRotorStartIndex = 0; // default to the single-thread case where there's 1 EnigmaBreaker that needs to cover A ...
+	private int slowRotorEndIndex = 25;  // through Z
 	
-	private volatile char[] solvedPositions = null;//new char[3];
-	private volatile List<SteckerCable> solvedSteckeredPairs = null;
+	private char[] solvedPositions = null;
+	private List<SteckerCable> solvedSteckeredPairs = null;
 	
 	public EnigmaBreaker( final String cipherText ) {
 		this( cipherText, SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT );
@@ -40,7 +40,7 @@ public class EnigmaBreaker extends Thread {
 		
 		if(parallelThreadCount==2) {
 			if(parallelThreadIndex==0) {
-				slowRotorEndIndex = 12;
+				slowRotorEndIndex = 12; 
 			}
 			else {
 				slowRotorStartIndex = 13;
@@ -102,13 +102,6 @@ public class EnigmaBreaker extends Thread {
 	}
 	
 	
-	public char[] getSolvedPositions() {
-		return this.solvedPositions;
-	}
-	public List<SteckerCable> getSolvedSteckeredPairs() {
-		return this.solvedSteckeredPairs;
-	}
-	
 	/**
 	 * Decrypt the given cipher text using a crib-drag attack. The count of stecker pairs must also be specified. The full set of 10 stecker pairs Enigma historically used
 	 * is supported, but for testing purposes it's usually desirable to use fewer to expedite testing.
@@ -127,7 +120,7 @@ public class EnigmaBreaker extends Thread {
 		log("using crib: " + crib);
 		final EnigmaMachine enigmaMachine = new EnigmaMachine();
 		
-		char[] initialPositions = new char[3];
+		char[] rotorPositions = new char[3];
 		
 		String substring = cipherText.substring(0, crib.getPlainText().length); // the first X characters of the cipher text.
 		final char[] substringArray = substring.toCharArray();
@@ -151,23 +144,22 @@ public class EnigmaBreaker extends Thread {
 			
 			// attempt to break with this particular stecker configuration by iterating through every possible rotor configuration.
 			for( int slowRotorIndex=slowRotorStartIndex; slowRotorIndex<=slowRotorEndIndex; slowRotorIndex++ ) {
-				initialPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
+				rotorPositions[0] = Alphabet.ALPHABET_ARRAY[slowRotorIndex];
 				
 				for( int middleRotorIndex=0; middleRotorIndex<26; middleRotorIndex++ ) {
-					initialPositions[1] = Alphabet.ALPHABET_ARRAY[middleRotorIndex];
+					rotorPositions[1] = Alphabet.ALPHABET_ARRAY[middleRotorIndex];
 					
 					for( int fastRotorIndex=0; fastRotorIndex<26; fastRotorIndex++ ) {
-						initialPositions[2] = Alphabet.ALPHABET_ARRAY[fastRotorIndex];
+						rotorPositions[2] = Alphabet.ALPHABET_ARRAY[fastRotorIndex];
 						
-						enigmaMachine.setRotors(initialPositions);
+						enigmaMachine.setRotors(rotorPositions);
 						
 						if( isMatchWithSettings(crib.getPlainText(), substringArray, enigmaMachine) ) {
-							// we found a match!!
-							// record the correct configuration to member variables so that EnigmaBreakerControl can retrieve them via #getSolvedPositions() and #getSolvedSteckerPairs()
-							// then, EnigmaBreakerControl can decrypt!
-							log("encryption key found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(initialPositions));
+							// we found a match!! record the correct configuration to member variables so that EnigmaBreakerControl can retrieve them via #getSolvedPositions() and 
+							// #getSolvedSteckerPairs() then, EnigmaBreakerControl can decrypt!
+							log("encryption key found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(rotorPositions));
 							
-							this.solvedPositions = initialPositions;
+							this.solvedPositions = rotorPositions;
 							this.solvedSteckeredPairs = steckeredPairs;
 							return; // all done, return asap
 						}
@@ -177,15 +169,30 @@ public class EnigmaBreaker extends Thread {
 		}
 	}
 	
-	
-	private static boolean isMatchWithSettings( char[] crib, char[] testString, final EnigmaMachine enigmaMachine ) {
-		
+	/**
+	 * determine if the given cipherTextSegment decrypts to the given crib when decrypted with the given EnigmaMachine state.
+	 * 
+	 * @param crib the plaintext of a phrase that is known to appear somewhere in an encrypted message.
+	 * @param cipherTextSegment a segment of encrypted text that is the same length as the crib, which may or may not match the crib when decrypted.
+	 * @param enigmaMachine
+	 * @return
+	 */
+	private static boolean isMatchWithSettings( char[] crib, char[] cipherTextSegment, final EnigmaMachine enigmaMachine ) {
 		for( int index=0; index<crib.length; index++ ) {
-			if( crib[index] != enigmaMachine.decrypt(testString[index]) )
+			if( crib[index] != enigmaMachine.decrypt(cipherTextSegment[index]) )
 				return false;
 		}
 		
 		return true;
+	}
+	
+	
+	public char[] getSolvedPositions() {
+		return this.solvedPositions;
+	}
+	
+	public List<SteckerCable> getSolvedSteckeredPairs() {
+		return this.solvedSteckeredPairs;
 	}
 	
 	private void log( final String message ) {

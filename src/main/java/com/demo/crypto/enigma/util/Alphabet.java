@@ -7,6 +7,7 @@ public class Alphabet {
 
 	public static final Character[] ALPHABET_ARRAY = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	
+	/** A static Map of alphabet letters to their indices. used for improved performance over ArrayUtils.indexOf(ALPHABET_ARRAY) for frequent lookups. */
 	private static final Map<Character, Integer> ALPHABET = new HashMap<Character, Integer>();
 	static {
 		ALPHABET.put('A', 0);
@@ -41,10 +42,22 @@ public class Alphabet {
 		return ALPHABET.get(character);
 	}
 	
+	/**
+	 * the next letter in the alphabet. returns A for Z.
+	 * 
+	 * @param character
+	 * @return
+	 */
 	public static char next(char character) {
 		return ALPHABET_ARRAY[ (indexOf(character)+1) % 26 ];
 	}
 	
+	/**
+	 * the alphabet character two letters from the given letter. returns A for Y and B for Z.
+	 * 
+	 * @param character
+	 * @return
+	 */
 	public static char afterNext(char character) {
 		return ALPHABET_ARRAY[ (indexOf(character)+2) % 26 ];
 	}
