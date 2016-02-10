@@ -17,16 +17,17 @@ public class EnigmaBreakerTest {
 	// this could be any valid positions, but for the sake of a thorough test that exercises the most code, choosing { Z, Z, Z }
 	private static final char[] TEST_INITIAL_POSITIONS = new char[]{ 'Z', 'Z', 'Z' };
 	
-	private static final String TEST_BREAKABLE_PLAIN_TEXT = "ANXGENERALHELLOWORLD";
+	private static final String TEST_BREAKABLE_PLAIN_TEXT = "ANXKOMXADMXUUUBOOTEZZZZZZZZZ";
 	private static final String TEST_UNBREAKABLE_PLAIN_TEXT = "HELLO";
 	
 	
-	@Test( expected=NoMatchingCribException.class )
+	@Test
 	public void testDecryptNoCrib() throws NoMatchingCribException {
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS );
 		
-		EnigmaBreaker EnigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_UNBREAKABLE_PLAIN_TEXT) );
-		EnigmaBreaker.decrypt();
+		EnigmaBreaker enigmaBreaker = new EnigmaBreaker( enigmaMachine.encrypt(TEST_UNBREAKABLE_PLAIN_TEXT) );
+		enigmaBreaker.decrypt();
+		assertNull( enigmaBreaker.getSolvedPositions() );
 	}
 	
 	@Test
@@ -57,7 +58,7 @@ public class EnigmaBreakerTest {
 	public void testDecryptTwoSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
 		steckeredPairs.add( new SteckerCable('B', 'E') );
-		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		steckeredPairs.add( new SteckerCable('U', 'Z') );
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
 		
@@ -71,7 +72,7 @@ public class EnigmaBreakerTest {
 	public void testDecryptThreeSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
 		steckeredPairs.add( new SteckerCable('A', 'E') );
-		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		steckeredPairs.add( new SteckerCable('U', 'Z') );
 		steckeredPairs.add( new SteckerCable('H', 'R') );
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine( TEST_INITIAL_POSITIONS, steckeredPairs );
@@ -86,7 +87,7 @@ public class EnigmaBreakerTest {
 	public void testDecryptFourSteckerPair() throws NoMatchingCribException {
 		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
 		steckeredPairs.add( new SteckerCable('B', 'E') );
-		steckeredPairs.add( new SteckerCable('L', 'Z') );
+		steckeredPairs.add( new SteckerCable('U', 'Z') );
 		steckeredPairs.add( new SteckerCable('H', 'R') );
 		steckeredPairs.add( new SteckerCable('O', 'X') );
 		

@@ -1,13 +1,17 @@
 package com.demo.crypto.enigma;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import com.demo.crypto.enigma.model.EnigmaMachine;
 import com.demo.crypto.enigma.model.SteckerCable;
@@ -17,21 +21,9 @@ import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 public class EnigmaBreakerControl {
 
 	public static void main( final String[] arguments ) throws IOException {
-		System.out.println("First enter a plain text message, or select a number to choose one of these WWII samples:");
-		System.out.println("  1. ANXGENERALHELLOWORLD  (translation: To General...)");
-		System.out.println("  2. KEINEBESONDERENEREIGNISSE (translation: No sepecial occurrences)");
-		System.out.print("  => ");
 		
 		BufferedReader reader = new BufferedReader( new InputStreamReader(System.in) );
-		String input = reader.readLine();
-		
-		String startPlainText = null;
-		if( "1".equals(input) )
-			startPlainText = "ANXGENERALHELLOWORLD"; // deciphers to ANXGENERALHELLOWORLD
-		else if( "2".equals(input) )
-			startPlainText = "KEINEBESONDERENEREIGNISSE";
-		else
-			startPlainText = input;
+		String startPlainText = getStartPlainText(reader);
 		
 		char[] initialPositions = getInitialPositions(reader);
 		
@@ -41,7 +33,7 @@ public class EnigmaBreakerControl {
 		for( int timer=0; timer<startPlainText.length(); timer++) {
 			try {
 				System.out.print("* ");
-				Thread.sleep(25);
+				Thread.sleep(15);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -49,9 +41,10 @@ public class EnigmaBreakerControl {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine(initialPositions, steckeredPairs);
 		String cipherText = enigmaMachine.encrypt(startPlainText);
-		System.out.println("\n\nWe encrypted your plain text " + startPlainText + " to " + cipherText + ". Now, let's see if we can decrypt it back now by re-discovering the rotor and stecker settings (these settings are Enigma's encryption 'key').");
+		System.out.println("\n\nWe encrypted your plain text to " + cipherText + ". Now, let's see if we can decrypt it back now by re-discovering the rotor and stecker settings (these settings are Enigma's encryption 'key').");
 		
 		int threadCount = getThreadCount(reader);
+		System.out.println("\nHere we go ...\n");
 		
 		String endPlainText = null;
 		
@@ -62,12 +55,12 @@ public class EnigmaBreakerControl {
 			enigmaBreaker.start();
 		}
 		
-		char[] solvedPositions = new char[3];
-		List<SteckerCable> solvedSteckeredPairs;
+		char[] solvedPositions = null;
+		List<SteckerCable> solvedSteckeredPairs = null;
 		
 		while(true) {
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(4000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -102,25 +95,79 @@ public class EnigmaBreakerControl {
 				break;
 			}
 			else if(!stillRunning) {
-				System.out.println("no solution found!");
+				break;
 			}
 		}
 		
-		enigmaMachine.setRotors(solvedPositions);
-		enigmaMachine.setSteckers(solvedSteckeredPairs);
+		if( solvedPositions==null ) {
+			System.out.println("\nno solution found! perhaps this sample message matches multiple cribs, and the breaker chose the wrong one?\n\n");
+		}
+		else {
+			enigmaMachine.setRotors(solvedPositions);
+			enigmaMachine.setSteckers(solvedSteckeredPairs);
+			endPlainText = enigmaMachine.decrypt(cipherText);
+			System.out.println("End plain text: " + endPlainText);
+		}
+	}
+	
+	
+	private static String getStartPlainText( final BufferedReader reader ) throws IOException {
+		String startPlainText = null;
 		
-		endPlainText = enigmaMachine.decrypt(cipherText);
-		System.out.println("End plain text: " + endPlainText);
+		final File sampleMessageDirectory = new File("src/main/resources/sample/message");
+		final File[] sampleMessageFiles = sampleMessageDirectory.listFiles();
+		final List<Properties> sampleMessages = new ArrayList<Properties>();
+		
+		System.out.println("First enter a plain text message, or select a number to choose one of these WWII samples:");
+		for( int index=0; index<sampleMessageFiles.length; index++ ) {
+			FileInputStream sampleMessage = new FileInputStream( sampleMessageFiles[index] );
+			Properties properties = new Properties();
+			properties.load(sampleMessage);
+			sampleMessages.add(properties);
+			
+			System.out.println("  " + (index+1) + ". " + properties.getProperty("plain_text"));
+			System.out.println("    (translation: " + properties.getProperty("translation"));
+		}
+		
+		while(true) {
+			System.out.print("  => ");
+			
+			String input = reader.readLine().trim();
+			
+			if( StringUtils.isNotBlank(input) ) {
+				int sampleMessageChoice = -1;
+				
+				if( input.length()==1 ) {
+					try {
+						sampleMessageChoice = Integer.valueOf(input);
+						Validate.isTrue(sampleMessageChoice > 0);
+						Validate.isTrue(sampleMessageChoice <= sampleMessages.size());
+						startPlainText = sampleMessages.get( sampleMessageChoice-1 ).getProperty("plain_text");
+					}
+					catch( IllegalArgumentException exception ) { }
+				}
+				else {
+					startPlainText = input;
+				}
+			}
+			
+			if(startPlainText == null)
+				System.out.println("Please enter a plain text message, or select a number to choose one of the above samples:");
+			else
+				break;
+		}
+		
+		return startPlainText;
 	}
 
-
+	
 	private static char[] getInitialPositions( final BufferedReader reader ) throws IOException {
 		char[] initialPositions = null;
 		
 		while(true) {
 			System.out.println("Now, enter a sequence of starting rotor positions, from left rotor to right. for example: ARH. Or, press enter for random positions: ");
 			System.out.print("  => ");
-			String input = reader.readLine();
+			String input = reader.readLine().trim();
 			
 			if( StringUtils.isBlank(input) ) {
 				initialPositions = ConfigurationUtil.generateRandomRotorPositions();
@@ -144,15 +191,16 @@ public class EnigmaBreakerControl {
 	
 	
 	private static List<SteckerCable> getSteckeredPairs( final BufferedReader reader ) throws IOException {
-		List<SteckerCable> steckeredPairs = null;
+		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
 		
 		while(true) {
 			System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");
 			System.out.println(" *tip: more than 3-4 steckers significantly increases processing time for decryption.");
 			System.out.print("  => ");
-			String input = reader.readLine();
+			String input = reader.readLine().trim();
 			if( StringUtils.isBlank(input) ) {
 				System.out.println("Using default of " + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + " stecker cables.");
+				steckeredPairs = ConfigurationUtil.generateRandomSteckers( SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT );
 				break;
 			}
 			else {
@@ -178,7 +226,7 @@ public class EnigmaBreakerControl {
 			System.out.println("Enter the number of parallel threads you'd like to use for for breaking the cipher; 1, 2, 4, or 8. Or press enter to use the default (1). ");
 			System.out.println(" *tip: use one thread per CPU core for fastest cipher break.");
 			System.out.print("  => ");
-			String input = reader.readLine();
+			String input = reader.readLine().trim();
 			if( StringUtils.isBlank(input) ) {
 				System.out.println("Using default of 1 thread.");
 				break;

@@ -112,17 +112,24 @@ public class EnigmaBreaker extends Thread {
 	 * @throws NoMatchingCribException 
 	 * @throws InterruptedException 
 	 */
-	public void decrypt() throws NoMatchingCribException {
+	public void decrypt() {
 		log("decrypting cipher text: " + cipherText);
 		
-		final Crib crib = CribDragger.getCribForMessage( cipherText ); // throws NoMatchingCribException, let it bubble up
+		Crib crib = null;
+		try {
+			crib = (new CribDragger()).getCribForMessage( cipherText );
+		}
+		catch( NoMatchingCribException NoMatchingCribException ) {
+			log("none of our known cribs are a possible match for this cipher text. exiting.");
+			return;
+		}
 		
-		log("using crib: " + crib);
+		log("using crib: " + crib + " starting at index " + crib.getStartIndex());
 		final EnigmaMachine enigmaMachine = new EnigmaMachine();
 		
 		char[] rotorPositions = new char[3];
 		
-		String substring = cipherText.substring(0, crib.getPlainText().length); // the first X characters of the cipher text.
+		String substring = cipherText.substring(crib.getStartIndex(), crib.getPlainText().length); // the first X characters of the cipher text.
 		final char[] substringArray = substring.toCharArray();
 		
 		SteckerCombinationTracker steckerCombinationTracker = new SteckerCombinationTracker(steckerPairCount);

@@ -89,7 +89,7 @@ public class EnigmaMachine {
 	 */
 	public String encrypt( final String plainText ) {
 		StringBuilder stringBuilder = new StringBuilder();
-		for( char character : plainText.toCharArray() )
+		for( char character : plainText.toUpperCase().toCharArray() )
 			stringBuilder.append( encrypt(character) );
 		
 		return stringBuilder.toString();
