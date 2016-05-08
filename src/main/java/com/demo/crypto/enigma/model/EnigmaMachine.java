@@ -4,6 +4,11 @@ import java.util.Collection;
 
 import com.demo.crypto.enigma.util.Alphabet;
 
+/**
+ * representation of a complete Enigma machine, including rotors, reflector, and Steckerbrett; and initial state for each.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class EnigmaMachine {
 
 	private static final char[] DEFAULT_INITIAL_POSITIONS = {'A','A','A'};

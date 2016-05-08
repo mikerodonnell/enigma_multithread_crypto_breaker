@@ -11,6 +11,11 @@ import java.util.Set;
 import com.demo.crypto.enigma.model.SteckerCable;
 import com.demo.crypto.enigma.exception.InvalidConfigurationException;
 
+/**
+ * helper class for iterating over all possible steckerbrett (plug board) combinations.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 	
 	public static final int DEFAULT_STECKER_PAIR_COUNT = 3; // TODO: 10

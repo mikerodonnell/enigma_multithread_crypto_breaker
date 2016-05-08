@@ -6,6 +6,13 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import com.demo.crypto.enigma.util.Alphabet;
 
+/**
+ * representation of a generic Enigma rotor. all rotors have 26 indices, each mapped to one other index. unlike reflectors, rotors are stepped with 
+ * each enciphered letter to change the overall machine state.
+ * 
+ * @see <a href="https://en.wikipedia.org/wiki/Enigma_rotor_details">https://en.wikipedia.org/wiki/Enigma_rotor_details</a>
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public abstract class AbstractEnigmaRotor implements Steppable {
 	
 	protected final char[] substitutions;

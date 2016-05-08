@@ -7,6 +7,12 @@ import java.util.Map;
 import com.demo.crypto.enigma.exception.DuplicateSteckerException;
 import com.demo.crypto.enigma.exception.InvalidConfigurationException;
 
+/**
+ * representation of the Enigma machine plug board, or Steckerbrett. a number of wires, each plugged into two letters, swaps output between the two. for example,
+ * plugging a wire, or stecker, into C and R results in output that would otherwise be C now being R, and vice versa.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class Steckerbrett {
 	
 	/** the mapping of substitution pair letters representing the Steckerbrett's wiring state. this is maintained reflexively -- if A=>B is added then 

@@ -1,7 +1,11 @@
 package com.demo.crypto.enigma.model;
 
-
-// Enigma I Rotor 2, 1930.  AJDKSIRUXBLHWTMCQGZNPYFVOE	1930
+/**
+ * representation of the Enigma I Rotor 2, 1930
+ * 
+ * @see <a href="https://en.wikipedia.org/wiki/Enigma_rotor_details">https://en.wikipedia.org/wiki/Enigma_rotor_details</a>
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class EnigmaIRotor2 extends AbstractEnigmaRotor {
 
 	private static final char[] SUBSTITUTIONS = {'A', 'J', 'D', 'K', 'S', 'I', 'R', 'U', 'X', 'B', 'L', 'H', 'W', 'T', 'M', 'C', 'Q', 'G', 'Z', 'N', 'P', 'Y', 'F', 'V', 'O', 'E'};

@@ -18,9 +18,14 @@ import com.demo.crypto.enigma.model.SteckerCable;
 import com.demo.crypto.enigma.util.ConfigurationUtil;
 import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
+/**
+ * captures configuration options from the user, kicks of code breaking, monitors progress, and reports back to user upon completion.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class EnigmaBreakerControl {
 
-	public static void main( final String[] arguments ) throws IOException {
+	public static void main( final String[] arguments ) throws IOException, InterruptedException {
 		
 		BufferedReader reader = new BufferedReader( new InputStreamReader(System.in) );
 		String startPlainText = getStartPlainText(reader);
@@ -41,7 +46,7 @@ public class EnigmaBreakerControl {
 		
 		EnigmaMachine enigmaMachine = new EnigmaMachine(initialPositions, steckeredPairs);
 		String cipherText = enigmaMachine.encrypt(startPlainText);
-		System.out.println("\n\nWe encrypted your plain text to " + cipherText + ". Now, let's see if we can decrypt it back now by re-discovering the rotor and stecker settings (these settings are Enigma's encryption 'key').");
+		System.out.println("\n\nWe encrypted your plain text to " + cipherText + ". Now, let's see if we can decrypt it back by re-discovering the rotor and stecker settings (these settings are Enigma's encryption 'key').");
 		
 		int threadCount = getThreadCount(reader);
 		System.out.println("\nHere we go ...\n");
@@ -59,11 +64,7 @@ public class EnigmaBreakerControl {
 		List<SteckerCable> solvedSteckeredPairs = null;
 		
 		while(true) {
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Thread.sleep(4000);
 			
 			EnigmaBreaker stoppedEnigmaBreaker = null;
 			boolean stillRunning = false;
@@ -84,7 +85,7 @@ public class EnigmaBreakerControl {
 			}
 			
 			if( stoppedEnigmaBreaker!=null ) {
-				System.out.println(stoppedEnigmaBreaker + " has returned with results! interrupting other threads now.");
+				System.out.println(stoppedEnigmaBreaker + " has returned with results! interrupting other threads now.\n");
 				
 				for( EnigmaBreaker enigmaBreaker : enigmaBreakers ) // first interrupt any remaining live threads
 					enigmaBreaker.interrupt();
@@ -106,11 +107,18 @@ public class EnigmaBreakerControl {
 			enigmaMachine.setRotors(solvedPositions);
 			enigmaMachine.setSteckers(solvedSteckeredPairs);
 			endPlainText = enigmaMachine.decrypt(cipherText);
-			System.out.println("End plain text: " + endPlainText);
+			System.out.println("End plain text: " + endPlainText + "\n\n");
 		}
 	}
 	
 	
+	/**
+	 * Capture the plain text (in German) sample to use for the simulation, either from user input for a set of preset options.
+	 * 
+	 * @param reader
+	 * @return a plain text String of the text to be encoded.
+	 * @throws IOException
+	 */
 	private static String getStartPlainText( final BufferedReader reader ) throws IOException {
 		String startPlainText = null;
 		
@@ -195,7 +203,7 @@ public class EnigmaBreakerControl {
 		
 		while(true) {
 			System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");
-			System.out.println(" *tip: more than 3-4 steckers significantly increases processing time for decryption.");
+			System.out.println(" *tip: 0-2 pairs cracks in minutes, 3-5 pairs cracks in hours, 6-10 pairs cracks in days!");
 			System.out.print("  => ");
 			String input = reader.readLine().trim();
 			if( StringUtils.isBlank(input) ) {

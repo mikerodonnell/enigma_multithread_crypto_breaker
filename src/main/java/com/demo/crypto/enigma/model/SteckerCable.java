@@ -1,9 +1,9 @@
 package com.demo.crypto.enigma.model;
 
 /**
- * a representation of a single Enigma steckerbrett (plugboard) cable. 
+ * a representation of a single Enigma steckerbrett (plug board) cable. 
  * 
- * @author mikerodonnell
+ * @author Mike O'Donnell  github.com/mikerodonnell
  */
 public class SteckerCable {
 

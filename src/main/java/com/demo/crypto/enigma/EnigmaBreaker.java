@@ -12,6 +12,12 @@ import com.demo.crypto.enigma.util.Alphabet;
 import com.demo.crypto.enigma.util.CribDragger;
 import com.demo.crypto.enigma.util.SteckerCombinationTracker;
 
+/**
+ * attempts to decipher encrypted Enigma messages by dividing the keyspace across a number of simulating Enigma 
+ * <a href="https://en.wikipedia.org/wiki/Bombe">bombes</a> and running them in parallel.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class EnigmaBreaker extends Thread {
 	
 	private String cipherText;
@@ -164,7 +170,7 @@ public class EnigmaBreaker extends Thread {
 						if( isMatchWithSettings(crib.getPlainText(), substringArray, enigmaMachine) ) {
 							// we found a match!! record the correct configuration to member variables so that EnigmaBreakerControl can retrieve them via #getSolvedPositions() and 
 							// #getSolvedSteckerPairs() then, EnigmaBreakerControl can decrypt!
-							log("encryption key found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(rotorPositions));
+							log("encryption key found!! steckers: " + steckeredPairs + "; rotor positions: " + Arrays.toString(rotorPositions) + "\n");
 							
 							this.solvedPositions = rotorPositions;
 							this.solvedSteckeredPairs = steckeredPairs;

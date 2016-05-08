@@ -3,6 +3,11 @@ package com.demo.crypto.enigma.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * utilities for working with the English alphabet.
+ * 
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public class Alphabet {
 
 	public static final Character[] ALPHABET_ARRAY = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
@@ -38,27 +43,43 @@ public class Alphabet {
 		ALPHABET.put('Z', 25);
 	}
 	
-	public static int indexOf(char character) {
-		return ALPHABET.get(character);
+	/**
+	 * get the index of the given character in the English alphabet, 0..25. case insensitive.
+	 * 
+	 * @param character
+	 * @return the integer in range 0..25 corresponding the given character if a valid English alphabet letter; null otherwise;
+	 */
+	public static Integer indexOf(char character) {
+		return ALPHABET.get(Character.toUpperCase(character));
 	}
 	
 	/**
-	 * the next letter in the alphabet. returns A for Z.
+	 * get the next letter in the English alphabet, in uppercase. returns A for Z.
 	 * 
 	 * @param character
-	 * @return
+	 * @return the next letter of the alphabet if a valid English alphabet character is given (A returned for Z); null otherwise.
 	 */
-	public static char next(char character) {
-		return ALPHABET_ARRAY[ (indexOf(character)+1) % 26 ];
+	public static Character next(char character) {
+		Integer indexOfGiven = indexOf(character);
+		
+		if(indexOfGiven==null)
+			return null;
+		
+		return ALPHABET_ARRAY[ (indexOfGiven+1) % 26 ];
 	}
 	
 	/**
-	 * the alphabet character two letters from the given letter. returns A for Y and B for Z.
+	 * the English alphabet character two letters after the given letter. returns A for Y and B for Z.
 	 * 
 	 * @param character
-	 * @return
+	 * @return the next-next letter of the alphabet if a valid English alphabet character is given (A returned for Y, B for Z); null otherwise.
 	 */
-	public static char afterNext(char character) {
-		return ALPHABET_ARRAY[ (indexOf(character)+2) % 26 ];
+	public static Character afterNext(char character) {
+		Integer indexOfGiven = indexOf(character);
+		
+		if(indexOfGiven==null)
+			return null;
+		
+		return ALPHABET_ARRAY[ (indexOfGiven+2) % 26 ];
 	}
 }
