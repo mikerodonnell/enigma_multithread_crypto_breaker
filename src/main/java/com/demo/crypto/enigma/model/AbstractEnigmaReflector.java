@@ -2,6 +2,13 @@ package com.demo.crypto.enigma.model;
 
 import com.demo.crypto.enigma.util.Alphabet;
 
+/**
+ * representation of a generic Enigma reflector. all reflectors have 26 indices, and input mirrors output. for example, if input 9 results in output
+ * 13, then input 13 will result in output 9.
+ * 
+ * @see <a href="https://en.wikipedia.org/wiki/Enigma_rotor_details">https://en.wikipedia.org/wiki/Enigma_rotor_details</a>
+ * @author Mike O'Donnell  github.com/mikerodonnell
+ */
 public abstract class AbstractEnigmaReflector {
 
 	/** the output characters for this reflector. for example, substitutions => [K, R, N, A ...] means this relector outputs K for input A, R for input B, N for input C, etc. */
