@@ -10,6 +10,7 @@ import com.demo.crypto.enigma.exception.NoMatchingCribException;
 import com.demo.crypto.enigma.model.crib.Crib;
 import com.demo.crypto.enigma.model.crib.NoSpecialOccurrences;
 import com.demo.crypto.enigma.model.crib.ToCommandingAdmiralOfUBoats;
+import com.demo.crypto.enigma.model.crib.ToFleetCruiserKoeln;
 
 /**
  * encapsulates the functionality of a "dragging" cribs against an encrypted message, a type of <a href="https://en.wikipedia.org/wiki/Known-plaintext_attack">
@@ -29,6 +30,7 @@ public class CribDragger {
 		List<Crib> temp = new ArrayList<Crib>();
 		temp.add(new NoSpecialOccurrences());
 		temp.add(new ToCommandingAdmiralOfUBoats());
+		temp.add(new ToFleetCruiserKoeln());
 		KNOWN_CRIBS = Collections.unmodifiableList( temp );
 	}
 	

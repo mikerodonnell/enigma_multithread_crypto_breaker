@@ -106,10 +106,17 @@ public class EnigmaMachine {
 	 * @param input
 	 * @return
 	 */
-	public char encrypt( char input ) {
+	private char encrypt( char input ) {
 		fastRotor.step();
 		
-		int originAbsoluteIndex = Alphabet.indexOf( steckerbrett.getSteckeredCharacter(input) );
+		int originAbsoluteIndex = -1;
+		try {
+			originAbsoluteIndex = Alphabet.indexOf( steckerbrett.getSteckeredCharacter(input) );
+		}
+		catch(NullPointerException nullPointerException) {
+			throw new IllegalArgumentException("Messages may only contain letters; letter substitutions should be used in place of numbers and punctuation characters.");
+		}
+		
 		int indexEnteringReflector = slowRotor.getOutputIndex(middleRotor.getOutputIndex(fastRotor.getOutputIndex(originAbsoluteIndex)));
 		
 		int indexLeavingReflector = reflector.getOutputIndex(indexEnteringReflector);

@@ -60,4 +60,13 @@ public class EnigmaMachineTest {
 		enigmaMachine.reset(); 
 		assertEquals( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", enigmaMachine.decrypt("JNIQOGLICIHRPAPSMWBXTWZNZJ") );
 	}
+	
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testEncryptInvalid() {
+		
+		EnigmaMachine enigmaMachine = new EnigmaMachine();
+		
+		enigmaMachine.encrypt("ABC1");
+	}
 }
