@@ -42,7 +42,9 @@ Historically, Enigma's settings were changed daily. Once the key was discovered 
 
 1. clone the repository: `git clone git@github.com:mikerodonnell/enigma_multithread_crypto_breaker.git`
 <br>
-2. `mvn clean install -DskipTests` (skipping tests is recommended for quick building)
+2. `cd enigma_multithread_crypto_breaker`
+<br>
+2. `mvn clean install`
 <br>
 3. `mvn exec:java`
 <br>
