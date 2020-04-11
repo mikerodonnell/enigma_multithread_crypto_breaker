@@ -1,13 +1,12 @@
 package com.demo.crypto.enigma.model;
 
 public interface Steppable {
-	
-	public void step();
-	
-	public int getOffset();
-	
-	public void setOffset(int offset);
 
-	public char getTurnoverCharacter();
-	
+	void step();
+
+	int getOffset();
+
+	void setOffset(int offset);
+
+	char getTurnoverCharacter();
 }

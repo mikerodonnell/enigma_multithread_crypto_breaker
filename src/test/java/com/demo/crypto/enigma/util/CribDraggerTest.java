@@ -1,69 +1,73 @@
 package com.demo.crypto.enigma.util;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.demo.crypto.enigma.exception.NoMatchingCribException;
 import com.demo.crypto.enigma.model.crib.Crib;
 import com.demo.crypto.enigma.model.crib.NoSpecialOccurrences;
 import com.demo.crypto.enigma.model.crib.ToCommandingAdmiralOfUBoats;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CribDraggerTest {
 
 	private CribDragger cribDragger;
-	
-	@Before
+
+	@BeforeEach
 	public void setup() {
 		cribDragger = new CribDragger();
 	}
-	
-	@Test( expected=NoMatchingCribException.class )
+
+	@Test
 	public void testGetCribForMessageNoMatch() throws NoMatchingCribException {
-		try{
-			cribDragger.getCribForMessage("AKKKKKZZZZZZZZZZZZZZZZZZEZZ");
-		}
-		catch(NoMatchingCribException noMatchingCribException) { // verify both calls to #getCribForMessage() throw a NoMatchingCribException
-			cribDragger.getCribForMessage("AZZZZZZZZZZ");
-		}
+		Assertions.assertThrows(NoMatchingCribException.class, () -> {
+			try {
+				cribDragger.getCribForMessage("AKKKKKZZZZZZZZZZZZZZZZZZEZZ");
+			} catch (NoMatchingCribException noMatchingCribException) { // verify both calls to #getCribForMessage() throw a NoMatchingCribException
+				cribDragger.getCribForMessage("AZZZZZZZZZZ");
+			}
+		});
 	}
-	
+
 	@Test
 	public void testGetCribForMessage() throws NoMatchingCribException {
 		Crib crib = cribDragger.getCribForMessage("ZZZZZZZZZZZZZZZZZZZ");
-		assertTrue( crib instanceof ToCommandingAdmiralOfUBoats );
-		assertEquals( new Integer(0), crib.getStartIndex() );
-		
+		assertTrue(crib instanceof ToCommandingAdmiralOfUBoats);
+		assertEquals(0, crib.getStartIndex());
+
 		crib = cribDragger.getCribForMessage("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
-		assertTrue( crib instanceof NoSpecialOccurrences );
-		assertEquals( new Integer(0), crib.getStartIndex() );
+		assertTrue(crib instanceof NoSpecialOccurrences);
+		assertEquals(0, crib.getStartIndex());
 	}
-	
-	@Test( expected=NoMatchingCribException.class )
+
+	@Test
 	public void testGetCribForMessageTooShort() throws NoMatchingCribException {
-		cribDragger.getCribForMessage("ZZ");
+		Assertions.assertThrows(NoMatchingCribException.class, () -> {
+			cribDragger.getCribForMessage("ZZ");
+		});
 	}
-	
-	@Test( expected=NoMatchingCribException.class )
+
+	@Test
 	public void testGetCribForMessageEmpty() throws NoMatchingCribException {
-		try {
-			cribDragger.getCribForMessage(new char[0]);
-		}
-		catch(NoMatchingCribException noMatchingCribException) { // verify both calls to #getCribForMessage() throw a NoMatchingCribException
-			cribDragger.getCribForMessage("");
-		}
+		Assertions.assertThrows(NoMatchingCribException.class, () -> {
+			try {
+				cribDragger.getCribForMessage(new char[0]);
+			} catch (NoMatchingCribException noMatchingCribException) { // verify both calls to #getCribForMessage() throw a NoMatchingCribException
+				cribDragger.getCribForMessage("");
+			}
+		});
 	}
-	
+
 	@Test
 	public void testGetCribForMessageMultipleMatches() throws NoMatchingCribException {
 		// verify that we get the longest known crib here. multiple cribs match, but KEINEBESONDERENEREIGNISSEXZUXBERICHTENXHEUTE is the longest one.
 		Crib crib = cribDragger.getCribForMessage("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
-		assertTrue( crib instanceof NoSpecialOccurrences );
-		assertEquals( new Integer(0), crib.getStartIndex() );
+		assertTrue(crib instanceof NoSpecialOccurrences);
+		assertEquals(0, crib.getStartIndex());
 	}
-	
-	
+
 	// @Test  TODO: re-institute this test when we have a crib that has no defined startIndex
 	public void testGetCribStartIndex() throws NoMatchingCribException {
 		/* verify that the correct start index is returned -- specifically the first index where the crib could exist. for example:
@@ -76,8 +80,7 @@ public class CribDraggerTest {
 						     KEINEBESONDERENEREIGNISSE     YES! (KEINEBESONDERENEREIGNISSE can exist at startIndex 4, nothing in EZZZZZZZZZZZZZZZZZZZZZZZZZ would have to encipher to itself to get KEINEBESONDERENEREIGNISSE.
 		*/
 		Crib crib = cribDragger.getCribForMessage("AEEEEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
-		assertTrue( crib instanceof NoSpecialOccurrences );
-		assertEquals( new Integer(4), crib.getStartIndex() );
+		assertTrue(crib instanceof NoSpecialOccurrences);
+		assertEquals(4, crib.getStartIndex());
 	}
-	
 }

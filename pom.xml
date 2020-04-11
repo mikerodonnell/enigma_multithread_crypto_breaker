@@ -7,13 +7,15 @@
 	<version>1.0-SNAPSHOT</version>
 
 	<properties>
-		<junit.version>4.12</junit.version>
+		<junit.version>5.6.2</junit.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
 	</properties>
 	
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -30,8 +32,17 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+					</configuration>
+				</plugin>
+				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.19</version>
+					<version>3.0.0-M4</version>
 					<configuration>
 						<trimStackTrace>false</trimStackTrace>
 					</configuration>
@@ -39,12 +50,10 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.4.0</version>
+					<version>1.6.0</version>
 					<configuration>
 						<executable>java</executable>
 						<mainClass>com.demo.crypto.enigma.EnigmaBreakerControl</mainClass>
-						<argument>-classpath</argument>
-						<classpath/>
 					</configuration>
 				</plugin>
 			</plugins>
