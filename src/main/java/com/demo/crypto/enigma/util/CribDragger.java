@@ -21,11 +21,7 @@ public class CribDragger {
 	 * A List of all known Cribs to attempt to match against cipher text in the crib drag. The lowest index item is the longest crib, and the highest
 	 * index is the shortest crib, so that matches can be attempted for longest (and therefore most reliable) cribs first.
 	 */
-	private final List<Crib> KNOWN_CRIBS;
-
-	public CribDragger() {
-		KNOWN_CRIBS = List.of(new NoSpecialOccurrences(), new ToCommandingAdmiralOfUBoats(), new ToFleetCruiserKoeln());
-	}
+	private final List<Crib> KNOWN_CRIBS = List.of(new NoSpecialOccurrences(), new ToCommandingAdmiralOfUBoats(), new ToFleetCruiserKoeln());
 
 	public Crib getCribForMessage(final String cipherText) throws NoMatchingCribException {
 		if (StringUtils.isNotBlank(cipherText)) {
@@ -36,10 +32,8 @@ public class CribDragger {
 	}
 
 	public Crib getCribForMessage(final char[] cipherText) throws NoMatchingCribException {
-
 		if (cipherText != null && cipherText.length > 0) {
-			for (Crib crib : KNOWN_CRIBS) { // ascending order is important here, Java for-each guarantees order as implemented by the Iterable interface, so we're good.
-
+			for (Crib crib : KNOWN_CRIBS) { // ascending order is important here
 				int offset = 0;
 				int maxOffset = cipherText.length - crib.getPlainText().length;
 
@@ -50,7 +44,6 @@ public class CribDragger {
 
 				while (offset <= maxOffset) {
 					for (int index = 0; index < cipherText.length; index++) {
-
 						// this crib can't exist at this index, Enigma never enciphers a character to itself!
 						if (crib.getPlainText()[index] == cipherText[index + offset]) {
 							break;

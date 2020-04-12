@@ -21,9 +21,6 @@ public class Steckerbrett {
 	 */
 	private Map<Character, Character> steckeredPairs = new HashMap<Character, Character>();
 
-	Steckerbrett() {
-	}
-
 	Steckerbrett(Collection<SteckerCable> steckeredPairs) {
 		stecker(steckeredPairs);
 	}
