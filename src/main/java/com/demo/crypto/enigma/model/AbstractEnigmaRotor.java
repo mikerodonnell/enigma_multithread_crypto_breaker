@@ -17,10 +17,6 @@ public abstract class AbstractEnigmaRotor implements Steppable {
 	protected int offset; // offset of 0 = A position, offset of 1 = B position, offset of 25 = Z position.
 	protected AbstractEnigmaRotor leftRotor;
 
-	public AbstractEnigmaRotor(char[] substitutions, char turnoverCharacter) {
-		this('A', substitutions, turnoverCharacter, null);
-	}
-
 	public AbstractEnigmaRotor(char initialPosition, char[] substitutions, char turnoverCharacter, AbstractEnigmaRotor leftRotor) {
 		this.substitutions = substitutions;
 		this.turnoverCharacter = turnoverCharacter;
@@ -40,11 +36,6 @@ public abstract class AbstractEnigmaRotor implements Steppable {
 
 	public AbstractEnigmaRotor getLeftRotor() {
 		return leftRotor;
-	}
-
-	@Override
-	public char getTurnoverCharacter() {
-		return turnoverCharacter;
 	}
 
 	/**

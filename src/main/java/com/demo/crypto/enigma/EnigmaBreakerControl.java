@@ -50,9 +50,9 @@ public class EnigmaBreakerControl {
 		int threadCount = getThreadCount(reader);
 		System.out.println("\nHere we go ...\n");
 
-		String endPlainText = null;
+		String endPlainText;
 
-		List<EnigmaBreaker> enigmaBreakers = new ArrayList<EnigmaBreaker>();
+		List<EnigmaBreaker> enigmaBreakers = new ArrayList<>();
 		for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
 			EnigmaBreaker enigmaBreaker = new EnigmaBreaker(cipherText, steckeredPairs.size(), threadIndex, threadCount);
 			enigmaBreakers.add(enigmaBreaker);
@@ -120,7 +120,7 @@ public class EnigmaBreakerControl {
 
 		final File sampleMessageDirectory = new File("src/main/resources/sample/message");
 		final File[] sampleMessageFiles = sampleMessageDirectory.listFiles();
-		final List<Properties> sampleMessages = new ArrayList<Properties>();
+		final List<Properties> sampleMessages = new ArrayList<>();
 
 		System.out.println("First enter a plain text message, or select a number to choose one of these WWII samples:");
 		for (int index = 0; index < sampleMessageFiles.length; index++) {
@@ -135,7 +135,6 @@ public class EnigmaBreakerControl {
 
 		while (true) {
 			System.out.print("  => ");
-
 			String input = reader.readLine().trim();
 
 			if (StringUtils.isNotBlank(input)) {
@@ -143,7 +142,7 @@ public class EnigmaBreakerControl {
 
 				if (input.length() == 1) {
 					try {
-						sampleMessageChoice = Integer.valueOf(input);
+						sampleMessageChoice = Integer.parseInt(input);
 						Validate.isTrue(sampleMessageChoice > 0);
 						Validate.isTrue(sampleMessageChoice <= sampleMessages.size());
 						startPlainText = sampleMessages.get(sampleMessageChoice - 1).getProperty("plain_text");
@@ -165,7 +164,7 @@ public class EnigmaBreakerControl {
 	}
 
 	private static char[] getInitialPositions(final BufferedReader reader) throws IOException {
-		char[] initialPositions = null;
+		char[] initialPositions;
 
 		while (true) {
 			System.out.println("Now, enter a sequence of starting rotor positions, from left rotor to right. for example: ARH. Or, press enter for random positions: ");
@@ -191,7 +190,7 @@ public class EnigmaBreakerControl {
 	}
 
 	private static List<SteckerCable> getSteckeredPairs(final BufferedReader reader) throws IOException {
-		List<SteckerCable> steckeredPairs = new ArrayList<SteckerCable>();
+		List<SteckerCable> steckeredPairs;
 
 		while (true) {
 			System.out.println("Finally, enter a number of stecker cables to use, 0 through 10. Or press enter to use the default (" + SteckerCombinationTracker.DEFAULT_STECKER_PAIR_COUNT + ").");

@@ -7,8 +7,6 @@ import com.demo.crypto.enigma.model.crib.ToCommandingAdmiralOfUBoats;
 import com.demo.crypto.enigma.model.crib.ToFleetCruiserKoeln;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,11 +24,7 @@ public class CribDragger {
 	private final List<Crib> KNOWN_CRIBS;
 
 	public CribDragger() {
-		List<Crib> temp = new ArrayList<Crib>();
-		temp.add(new NoSpecialOccurrences());
-		temp.add(new ToCommandingAdmiralOfUBoats());
-		temp.add(new ToFleetCruiserKoeln());
-		KNOWN_CRIBS = Collections.unmodifiableList(temp);
+		KNOWN_CRIBS = List.of(new NoSpecialOccurrences(), new ToCommandingAdmiralOfUBoats(), new ToFleetCruiserKoeln());
 	}
 
 	public Crib getCribForMessage(final String cipherText) throws NoMatchingCribException {

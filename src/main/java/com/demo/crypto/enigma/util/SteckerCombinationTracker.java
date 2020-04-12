@@ -16,16 +16,12 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 
 	public static final int DEFAULT_STECKER_PAIR_COUNT = 3; // TODO: 10
 	private int steckerPairCount = DEFAULT_STECKER_PAIR_COUNT;
-	List<SteckerCable> currentPairs = null;
+	private List<SteckerCable> currentPairs = null;
 
 	/**
 	 * the number of combinations that have been given so far (the number of times #next() has been called). may be used for tracking progress.
 	 */
 	private long combinationsCount = 0;
-
-	public SteckerCombinationTracker() {
-		this(DEFAULT_STECKER_PAIR_COUNT);
-	}
 
 	public SteckerCombinationTracker(int steckerPairCount) {
 		if (steckerPairCount < 0) {
@@ -41,7 +37,6 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 
 	@Override
 	public boolean hasNext() {
-
 		boolean hasNext = true;
 		// every instance of SteckerCombinationTracker returns an empty List first, regardless of steckerPairCount. so, there's a next pair unless:
 		//  * steckerPairCount is 0, AND we've already given out our empty List
@@ -51,10 +46,7 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 		if (combinationsCount > 0) { // if next() has never been called, hasNext is true.
 			if (steckerPairCount == 0) {
 				hasNext = false;
-			} else if (currentPairs.isEmpty()) // if currentPairs is empty, next() has been called exactly once, we have more pairs as long as steckerPairCount>0
-			{
-				hasNext = true;
-			} else {
+			} else if (!currentPairs.isEmpty()) { // if currentPairs is empty, next() has been called exactly once, we have more pairs as long as steckerPairCount>0
 				boolean hasCableThatCanMove = false;
 
 				// index=0 is the leftmost cable. start at the rightmost and work our way left, seeing if any of our stecker cables can move to the right. if all our
@@ -87,15 +79,16 @@ public class SteckerCombinationTracker implements Iterator<List<SteckerCable>> {
 	@Override
 	public List<SteckerCable> next() {
 		if (currentPairs == null) {
-			currentPairs = new ArrayList<SteckerCable>();
+			currentPairs = new ArrayList<>();
 		} else if (currentPairs.isEmpty()) {
 			if (steckerPairCount >= 1) {
 				currentPairs.add(new SteckerCable('A', 'B'));
 
 				// now, plug the rest of the stecker cables into their starting positions. though the leftmost can can be anywhere depending on the parallelThreadIndex, the
 				// rest of the cables always start immediately to the right.
-				for (int index = 0; index < steckerPairCount - 1; index++)
+				for (int index = 0; index < steckerPairCount - 1; index++) {
 					currentPairs.add(new SteckerCable(Alphabet.next(currentPairs.get(index).getOutput()), Alphabet.afterNext(currentPairs.get(index).getOutput())));
+				}
 			}
 		} else {
 			for (int index = currentPairs.size() - 1; index >= 0; index--) {

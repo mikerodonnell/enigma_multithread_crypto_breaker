@@ -21,7 +21,7 @@ import java.util.List;
 public class EnigmaBreaker extends Thread {
 
 	private String cipherText;
-	private int steckerPairCount;
+	private int steckerPairCount; // the number of stecker pairs used in the Enigma machine. regardless of this value, an unsteckered configuration is always attempted first.
 	private int parallelThreadIndex = 0;
 	private int parallelThreadCount = 1; // valid values: 1, 2, 4, 8
 	private int slowRotorStartIndex = 0; // default to the single-thread case where there's 1 EnigmaBreaker that needs to cover A ...
@@ -98,16 +98,13 @@ public class EnigmaBreaker extends Thread {
 	 * Decrypt the given cipher text using a crib-drag attack. The count of stecker pairs must also be specified. The full set of 10 stecker pairs Enigma historically used
 	 * is supported, but for testing purposes it's usually desirable to use fewer to expedite testing.
 	 *
-	 * @param cipherText
-	 * @param steckerPairCount the number of stecker pairs used in the Enigma machine. regardless of this value, an unsteckered configuration is always attempted first.
-	 * @return the plain text corresponding to the given cipher text.
 	 * @throws NoMatchingCribException
 	 * @throws InterruptedException
 	 */
 	public void decrypt() {
 		log("decrypting cipher text: " + cipherText);
 
-		Crib crib = null;
+		Crib crib;
 		try {
 			crib = (new CribDragger()).getCribForMessage(cipherText);
 		} catch (NoMatchingCribException NoMatchingCribException) {
@@ -212,8 +209,7 @@ public class EnigmaBreaker extends Thread {
 
 	@Override
 	public boolean equals(Object obj) {
-
-		if (obj != null && obj instanceof EnigmaBreaker) {
+		if (obj instanceof EnigmaBreaker) {
 			EnigmaBreaker other = (EnigmaBreaker) obj;
 			return (this.parallelThreadIndex == other.parallelThreadIndex);
 		}

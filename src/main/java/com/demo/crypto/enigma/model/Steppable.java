@@ -7,6 +7,4 @@ public interface Steppable {
 	int getOffset();
 
 	void setOffset(int offset);
-
-	char getTurnoverCharacter();
 }
