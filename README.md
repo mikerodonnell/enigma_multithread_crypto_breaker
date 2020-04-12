@@ -1,8 +1,8 @@
-##About
+## about
 
 Enigma was a revolutionary encryption tool used by the Germans during World War II. Numberphile provides a great [overview of Enigma's operation and mathematical complexity](https://www.youtube.com/watch?v=G2_Q9FoD-oQ). This program breaks the Enigma cipher the using a 3-step process:
 
-1. **The Exploit** -- Enigma never enciphers a character to itself. Exploit this weakness by seeing where known common phrases, called "cribs" might exist. For example, many Nazi naval messages were known to begin with ANXKOMXADMXUUUBOOTE<sup>[1](#footnote1)</sup> ("An Kom Adm UUU Boote" after removing X's that are used as spaces<sup>[2](#footnote2)</sup>, which is abbreviated for "An Kommandie Admiral UUU Boote", translated "To Commanding Admiral of U-Boats"). So if the following encrypted message was intercepted:
+1. **The Exploit** -- Enigma never enciphers a character to itself. Exploit this weakness by seeing where known common phrases, called "cribs" might exist. For example, many Nazi naval messages were known to begin with ANXKOMXADMXUUUBOOTE<sup>[1](#footnote1)</sup> ("An Kom Adm UUU Boote", after removing X's that are used as spaces<sup>[2](#footnote2)</sup>, which is abbreviated for "An Kommandie Admiral UUU Boote", translated "To Commanding Admiral of U-Boats"). So if the following encrypted message was intercepted:
 <br>
 `ENNRTCWAQPZAWXCPOREUMPOQXZDFRRTBMLOJTFRFF`  
 <br>
@@ -38,18 +38,16 @@ Translation: To Commanding Admiral of U Boats, Comsubs Training, Comsubs East, S
 Historically, Enigma's settings were changed daily. Once the key was discovered (step 2), the rest of the day's messages could be decrypted by skipping to step 3. This demo uses one sample message at a time.
 <br>
 
-##Usage
+## usage
 
-1. clone the repository: `git clone git@github.com:mikerodonnell/enigma_multithread_crypto_breaker.git`
-<br>
-2. `cd enigma_multithread_crypto_breaker`
-<br>
-2. `mvn clean install`
-<br>
-3. `mvn exec:java`
+1. requires java 1.8 or later
+1. `git clone git@github.com:mikerodonnell/enigma_multithread_crypto_breaker.git`
+1. `cd enigma_multithread_crypto_breaker`
+1. `mvn clean install`
+1. `mvn exec:java`
 <br>
 
-##How is this different from other Enigma implementations?
+## how is this different from other Enigma implementations?
 
 * Most Enigma implementations simulate the encryption/decryption for a given key, but don't include functionality to break the encryption.
 * Many encryption-breaking Enigma implementations use a standard dictionary attack, instead of the more historically accurate crib drag attack.
@@ -57,10 +55,10 @@ Historically, Enigma's settings were changed daily. Once the key was discovered 
 * Most implementations that do support at least a partial steckerboard are single-threaded. Using parallel threads, each responsible for a subset of the total combinations, improves performance on multi-core machines.
 <br>
 
-##Math!
+## math!
 One of the major challenges of implementing the Enigma attack is to efficiently iterate over each possible stecker combination. In practice, the M3 Enigma used 10 steckered pairs, though 0 through 13 are possible. How many combinations should we expect? Consider the simplest case of a single stecker cable:
 Combinations will include A=>B, then A=>B, A=>C, etc. all the way to A=>Z. A=>B is the same as B=>A since the stecker cables are just bidirectional electric connections. So when we're done checking all the A combinations, we can start the B combinations with B=>C:
-```java
+```
 A=>B A=>C A=>D A=>E A=>F ... A=>Z // 25 combinations
      B=>C B=>D B=>E B=>F ... B=>Z // 24 combinations
           C=>D C=>E C=>F ... C=>Z // 23 combinations
@@ -74,7 +72,7 @@ If we add one additional cable, it will start at `C=>D`. This is 2 positions to 
 <br>
 
 
-##Performance
+## performance
 The time to break the cipher varies with the number of stecker cables used. On a reasonable 4 or 8 core machine:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;0-1 stecker pairs **&rarr;** seconds<br>
 &nbsp;&nbsp;&nbsp;&nbsp;2-3 stecker pairs **&rarr;** minutes<br>
@@ -83,18 +81,18 @@ The time to break the cipher varies with the number of stecker cables used. On a
 
 The attack is processor intensive and uses very little memory. Benchmarks with [jstat](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html) show total Java heap consumption hovering around 60 kB regardless of thread count.
 
-##Tools used
+## tools
 
 * [Maven Surefire plugin](https://maven.apache.org/surefire/maven-surefire-plugin) _recent versions of Surefire allow terminating testing upon first failure, which is useful for projects with long-running tests._
 * [Maven Exec plugin](http://www.mojohaus.org/exec-maven-plugin) _for easy usage through command line._
-* [JUnit](http://junit.org)
+* [JUnit 5](http://junit.org)
 * [Apache Commons Lang](https://commons.apache.org/proper/commons-lang)
 * [jstat](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html) _for memory benchmarking_
 <br>
 
-##Footnotes
+## footnotes
 
-<a name="footnote1">1</a>. although this implementation is based on the Army M3 Enigma machine, some cribs and sample messages more applicable to the Naval M4 Enigma or other Enigma variations are used as well.<br>
+<a name="footnote1">1</a>. Although this implementation is based on the Army M3 Enigma machine, some cribs and sample messages more applicable to the Naval M4 Enigma or other Enigma variations are used as well.<br>
 <a name="footnote2">2</a>. Numbers were spelled out in Enigma messages. Additionally, a number of reserved character sequences are used in Enigma messages, including:
 
 &nbsp;&nbsp;&nbsp;&nbsp;X **&rarr; .** or (space)<br>
@@ -105,8 +103,7 @@ The attack is processor intensive and uses very little memory. Benchmarks with [
 <a name="footnote3">3</a>. Several different combinations might yield the same crib, especially for shorter cribs. The cipher text would then be decrypted which each of the combinations in inspected manually; one would contain German military instructions and the others would contain gibberish. Longer cribs are preferable as the increased entropy results in fewer false positives.
 <br>
 
-##Credits and Further reading
-* [http://enigma.louisedade.co.uk](http://enigma.louisedade.co.uk)
+## credits and further reading
 * [https://en.wikipedia.org/wiki/Enigma_machine](https://en.wikipedia.org/wiki/Enigma_machine)
 * [https://en.wikipedia.org/wiki/Enigma_rotor_details](https://en.wikipedia.org/wiki/Enigma_rotor_details)
 * [www.enigma.hoerenberg.com](www.enigma.hoerenberg.com)
